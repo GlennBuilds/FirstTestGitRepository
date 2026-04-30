@@ -1,20 +1,19 @@
-# Holiday Trip UI Setup
+# Balkan Roadtrip Planner
 
-This repository now contains a responsive starter interface for a holiday trip page.
+This repository contains the Balkan roadtrip planning pages for June/July 2026.
 
 ## Files
-- `index.html` – semantic page layout
-- `styles.css` – responsive styling for desktop/tablet/mobile
-- `app.js` – mock data and DOM rendering
+- `index.html` – detailed day-by-day planning page
+- `routekaart.html` – interactive route map with compact mobile layout and expandable daily advice
+- `balkan_route_definitief_donderdag_2026.html` – redirect kept for old links
+- `styles.css` – styling for the detailed planning page
+- `app.js` – small interactions for the detailed planning page
 
 ## Run locally
-Because this is plain HTML/CSS/JS, you can open `index.html` directly in a browser.
+Because this is plain HTML/CSS/JS, you can open the HTML files directly in a browser.
 
 Optional local server:
 ```bash
-python3 -m http.server 8080
+python3 -m http.server 8000
 ```
-Then open http://localhost:8080.
-
-## Next step
-Once you share real trip details, we can replace the mock data in `app.js`.
+Then open http://localhost:8000/routekaart.html.
