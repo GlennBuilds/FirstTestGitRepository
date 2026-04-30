@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Holiday Trip Planner</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="container">
+        <p class="eyebrow">Trip Dashboard</p>
+        <h1 id="trip-title">Summer Escape 2026</h1>
+        <p id="trip-summary">
+          A mobile-friendly trip page we can quickly update with real travel details later.
+        </p>
+        <div class="hero-meta">
+          <span id="trip-dates">July 12–19, 2026</span>
+          <span id="trip-location">Lisbon, Portugal</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="container layout">
+      <section class="card">
+        <h2>Travel Team</h2>
+        <ul id="travel-team" class="pill-list"></ul>
+      </section>
+
+      <section class="card">
+        <h2>Itinerary Highlights</h2>
+        <div id="itinerary" class="timeline"></div>
+      </section>
+
+      <section class="card split">
+        <div>
+          <h2>Budget Snapshot</h2>
+          <ul id="budget" class="simple-list"></ul>
+        </div>
+        <div>
+          <h2>Packing Must-Haves</h2>
+          <ul id="packing" class="simple-list"></ul>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Notes</h2>
+        <p id="notes"></p>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
