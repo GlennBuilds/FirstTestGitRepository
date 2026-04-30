@@ -1,17 +1,20 @@
-# FirstTestGitRepository
+# Holiday Trip UI Setup
 
-This is my first test repository.
+This repository now contains a responsive starter interface for a holiday trip page.
 
-## What this is for
+## Files
+- `index.html` – semantic page layout
+- `styles.css` – responsive styling for desktop/tablet/mobile
+- `app.js` – mock data and DOM rendering
 
-I am using this repository to test:
+## Run locally
+Because this is plain HTML/CSS/JS, you can open `index.html` directly in a browser.
 
-- Git
-- GitHub Desktop
-- Cursor
-- Basic file changes
-- Commits and pushes
+Optional local server:
+```bash
+python3 -m http.server 8080
+```
+Then open http://localhost:8080.
 
-## First test
-
-This repository contains a very simple Python script.
+## Next step
+Once you share real trip details, we can replace the mock data in `app.js`.

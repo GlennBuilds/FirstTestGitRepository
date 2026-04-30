@@ -1,0 +1,136 @@
+:root {
+  color-scheme: light;
+  --bg: #f4f7fb;
+  --surface: #ffffff;
+  --text: #12263a;
+  --muted: #536a82;
+  --accent: #3b82f6;
+  --border: #dbe6f1;
+  --shadow: 0 10px 30px rgba(14, 30, 62, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: var(--text);
+  background: linear-gradient(180deg, #eef4fc 0%, var(--bg) 360px);
+}
+
+.container {
+  width: min(100% - 2rem, 980px);
+  margin-inline: auto;
+}
+
+.hero {
+  padding: 3rem 0 2rem;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+}
+
+h1 {
+  margin: 0.4rem 0;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+}
+
+.hero p {
+  color: var(--muted);
+  max-width: 65ch;
+}
+
+.hero-meta {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.hero-meta span {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.9rem;
+}
+
+.layout {
+  display: grid;
+  gap: 1rem;
+  padding-bottom: 2.5rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow);
+}
+
+.card h2 {
+  margin-top: 0;
+  font-size: 1.2rem;
+}
+
+.pill-list,
+.simple-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.pill-list li {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  background: #e8f1ff;
+  color: #1c4a88;
+  width: fit-content;
+}
+
+.timeline {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.timeline-item {
+  border-left: 3px solid var(--accent);
+  padding-left: 0.75rem;
+}
+
+.timeline-item small {
+  color: var(--muted);
+}
+
+.split {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 760px) {
+  .layout {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .layout .card:nth-child(2),
+  .layout .card:nth-child(3),
+  .layout .card:nth-child(4) {
+    grid-column: 1 / -1;
+  }
+
+  .split {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
