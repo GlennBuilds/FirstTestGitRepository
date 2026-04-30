@@ -1,0 +1,2001 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Balkan routekaart 2026</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <style>
+    html, body { height:100%; margin:0; font-family: Arial, sans-serif; color:#172033; background:#f4f6fa; }
+    .layout { display:grid; grid-template-columns: minmax(420px, 37vw) 1fr; height:100%; }
+    .side { overflow:auto; background:#fff; border-right:1px solid #dce3ef; padding:18px 18px 28px; }
+    .mapwrap { position:relative; }
+    #map { height:100%; width:100%; }
+    h1 { margin:0 0 8px; font-size:28px; line-height:1.15; }
+    .sub { color:#586377; font-size:14px; line-height:1.45; margin-bottom:14px; }
+    .note { background:#eef4ff; border:1px solid #cddbff; color:#173ea5; border-radius:14px; padding:12px 14px; font-size:13px; line-height:1.45; margin-bottom:14px; }
+    .legend { background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; border-radius:14px; padding:12px 14px; font-size:13px; line-height:1.45; margin-bottom:16px; }
+    .buttons { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+    button { border:1px solid #d6deeb; background:#fff; border-radius:999px; padding:9px 12px; cursor:pointer; font-size:13px; font-weight:700; color:#1d2b46; }
+    button:hover { background:#f8fbff; }
+    button.primary { background:#173ea5; color:#fff; border-color:#173ea5; }
+    .day { border:1px solid #e4e9f2; border-radius:16px; margin-bottom:10px; background:#fbfcfe; overflow:hidden; }
+    .day:hover { border-color:#bfd0f5; background:#f7faff; }
+    .day-main { width:100%; border:0; background:transparent; border-radius:0; padding:12px; color:inherit; cursor:pointer; text-align:left; }
+    .day-main:hover { background:#f7faff; }
+    .day h3 { margin:0 0 4px; font-size:16px; }
+    .meta { color:#5b667a; font-size:13px; margin-bottom:7px; }
+    .pill { display:inline-block; font-size:12px; font-weight:700; color:#173ea5; background:#eef3ff; padding:4px 8px; border-radius:999px; margin-bottom:8px; }
+    .mini { font-size:12px; color:#6a7488; line-height:1.45; }
+    .route { margin:8px 0 0 18px; padding:0; font-size:13px; line-height:1.45; }
+    .chips { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
+    .chip { display:inline-block; font-size:11px; font-weight:700; color:#173ea5; background:#eef3ff; padding:4px 7px; border-radius:999px; }
+    .day-details { border-top:1px solid #e4e9f2; padding:0 12px 12px; }
+    .day-details summary { cursor:pointer; color:#173ea5; font-size:13px; font-weight:800; padding:10px 0; }
+    .facts { display:grid; grid-template-columns:1fr; gap:7px; margin-bottom:10px; }
+    .fact { background:#fff; border:1px solid #e4e9f2; border-radius:11px; padding:8px 9px; font-size:12px; line-height:1.4; }
+    .fact strong { display:block; color:#5b667a; font-size:11px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:3px; }
+    .advice-grid { display:grid; gap:8px; }
+    .advice { background:#fff; border:1px solid #e4e9f2; border-radius:12px; padding:10px; font-size:12px; line-height:1.45; }
+    .advice h4 { margin:0 0 6px; font-size:13px; color:#172033; }
+    .advice p { margin:0; }
+    .advice ul { margin:0; padding-left:17px; }
+    .advice li + li { margin-top:4px; }
+    .maplink { display:inline-flex; margin-top:10px; color:#173ea5; font-weight:800; font-size:12px; }
+    .optional { border-style:dashed; background:#fffaf8; }
+    .swatch { display:inline-block; width:10px; height:10px; border-radius:999px; margin-right:7px; vertical-align:middle; }
+    .zoomhint { position:absolute; right:14px; top:14px; z-index:500; background:rgba(255,255,255,.96); border:1px solid #dce3ef; border-radius:12px; padding:10px 12px; font-size:12px; color:#475569; max-width:280px; box-shadow:0 8px 24px rgba(15,23,42,.08); }
+    @media (max-width: 980px) {
+      html, body { height:auto; min-height:100%; overflow-x:hidden; }
+      .layout { display:flex; flex-direction:column; min-height:100vh; height:auto; }
+      .mapwrap { order:1; position:sticky; top:0; z-index:20; height:52vh; min-height:360px; border-bottom:1px solid #dce3ef; background:#dbeafe; }
+      #map { height:100%; min-height:360px; }
+      .side { order:2; overflow:visible; border-right:none; padding:12px 12px 24px; }
+      h1 { font-size:22px; }
+      .sub { margin-bottom:10px; }
+      .note { padding:10px 12px; margin-bottom:10px; }
+      .buttons { position:sticky; top:52vh; z-index:18; background:rgba(255,255,255,.96); padding:8px 0 10px; margin:0 0 10px; }
+      .buttons button { flex:1 1 140px; border-radius:12px; }
+      .day { margin-bottom:8px; border-radius:14px; }
+      .day-main { padding:10px; }
+      .day h3 { font-size:15px; line-height:1.25; }
+      .meta { font-size:12px; margin-bottom:5px; }
+      .pill { font-size:11px; margin-bottom:0; }
+      .chips, .day-main .mini, .day-main .route { display:none; }
+      .day-details { padding:0 10px 10px; }
+      .facts { grid-template-columns:1fr; }
+      .advice { padding:9px; }
+      .zoomhint { left:10px; right:10px; top:10px; max-width:none; padding:8px 10px; font-size:11px; }
+    }
+    @media (max-width: 520px) {
+      .mapwrap { height:46vh; min-height:310px; }
+      #map { min-height:310px; }
+      .buttons { top:46vh; }
+      .sub { display:none; }
+      .note { font-size:12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="side">
+      <h1>Balkan roadtrip 2026</h1>
+      <div class="sub">Alles in één overzicht, met alle tussenstops op de kaart én de adviezen, tips en opties uit de definitieve detailplanning.</div>
+      <div class="note"><strong>Definitieve route:</strong> za 13 juni t/m do 2 juli 2026, zonder flexdagen. Klik een dag aan om de route te focussen; klap de details open voor alle tips.</div>
+      <div class="buttons">
+        <button class="primary" onclick="showAll()">Toon hele route</button>
+        <button onclick="fitAll()">Zoom volledig</button>
+      </div>
+      <div id="daylist"></div>
+    </aside>
+    <main class="mapwrap">
+      <div class="zoomhint">Klik links op een dag om alleen dat traject uit te lichten.</div>
+      <div id="map"></div>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script>
+    const days = [
+      {
+            "dayNumber": 1,
+            "date": "Za 13 juni 2026",
+            "title": "Aankomst in Montenegro",
+            "overnight": "Podgorica",
+            "points": [
+                  {
+                        "name": "Podgorica Airport, Montenegro",
+                        "lat": 42.3594,
+                        "lon": 19.2519
+                  },
+                  {
+                        "name": "Podgorica, Montenegro",
+                        "lat": 42.4304,
+                        "lon": 19.2594
+                  }
+            ],
+            "notes": "Houd deze dag echt leeg. Doel is alleen landen, auto ophalen of transfer regelen, water inslaan en slapen.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=Podgorica%20Airport%2C%20Montenegro&destination=Podgorica%2C%20Montenegro&travelmode=driving",
+            "chips": [
+                  "aankomst",
+                  "easy",
+                  "late vlucht"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Podgorica"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "15-20 min naar hotel"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Podgorica Airport → hotel in Podgorica"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "Na landing om 22:55 is het veel fijner om meteen te slapen dan nog een rit te doen."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Houd deze dag echt leeg. Doel is alleen landen, auto ophalen of transfer regelen, water inslaan en slapen.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Aankomst op Podgorica Airport</li><li>Korte rit naar hotel</li><li>Inchecken, spullen klaarleggen voor morgen</li><li>Goed slapen</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Geen inhoudsdag, wel fijn als hotel praktische parking en late check-in heeft</li><li>Pak eventueel nog water, fruit of snacks voor de volgende ochtend</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Hotel met balkon of rustige ligging</li><li>Late snack als dat nog lukt</li><li>Check alvast waar je morgen ontbijt of koffie pakt</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Geen extra programma nodig; de winst van vandaag zit juist in rust</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Niet relevant; dit is vooral een aankomstavond.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Kies een hotel met makkelijke toegang en eigen parking</li><li>Laat koffers niet onnodig lang in de auto</li><li>Zet navigatie voor morgen alvast klaar</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Laat vandaag expres saai zijn. Dat maakt de rest van de reis beter.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 2,
+            "date": "Zo 14 juni 2026",
+            "title": "Zachte start naar Lake Skadar",
+            "overnight": "Virpazar",
+            "points": [
+                  {
+                        "name": "Podgorica, Montenegro",
+                        "lat": 42.4304,
+                        "lon": 19.2594
+                  },
+                  {
+                        "name": "Virpazar, Montenegro",
+                        "lat": 42.2467,
+                        "lon": 19.0917
+                  }
+            ],
+            "notes": "Maak dit een landingsdag in de reis: rustig ontbijt, korte rit, vroege check-in en vooral niet te veel willen doen.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=Podgorica%2C%20Montenegro&destination=Virpazar%2C%20Montenegro&travelmode=driving",
+            "chips": [
+                  "meer",
+                  "rustig",
+                  "korte rit"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Virpazar"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "30-40 min"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Podgorica → Virpazar"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "Een heel korte rit maakt dit de perfecte zachte startdag na de late aankomst."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Maak dit een landingsdag in de reis: rustig ontbijt, korte rit, vroege check-in en vooral niet te veel willen doen.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Rustig ontbijt in Podgorica</li><li>Korte rit naar Virpazar</li><li>Inchecken</li><li>Terrasje of kleine wandeling door het dorp</li><li>Vroeg diner aan het water</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Eerste uitzicht over Lake Skadar</li><li>Virpazar zelf als klein watersport- en bootdorp</li><li>Besac Fortress als korte extra stop</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Koffie aan het water</li><li>Kleine sunset-boottocht</li><li>Korte scenic rit naar Godinje of Karuč</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Besac Fortress viewpoint</li><li>Kleine boottocht van 1,5 à 2 uur</li><li>Extra fotostop op een heuvel boven het meer</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Bij regen gewoon hotel, lunch, kort dorpje en eventueel alleen een uitkijkpunt.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Vandaag geen strak schema</li><li>Neem zonnehoed, water en iets lichts mee</li><li>Als jullie morgen willen varen: regel dat vandaag alvast</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Zie dit als resetdag: de vakantie begint hier echt.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 3,
+            "date": "Ma 15 juni 2026",
+            "title": "Lake Skadar panoramadag",
+            "overnight": "Virpazar",
+            "points": [
+                  {
+                        "name": "Virpazar, Montenegro",
+                        "lat": 42.2467,
+                        "lon": 19.0917
+                  },
+                  {
+                        "name": "Besac Fortress, Montenegro",
+                        "lat": 42.2478,
+                        "lon": 19.0947
+                  },
+                  {
+                        "name": "Godinje, Montenegro",
+                        "lat": 42.2477,
+                        "lon": 19.1728
+                  },
+                  {
+                        "name": "Murici Beach, Montenegro",
+                        "lat": 42.2149,
+                        "lon": 19.1448
+                  },
+                  {
+                        "name": "Karuc, Montenegro",
+                        "lat": 42.3259,
+                        "lon": 19.1401
+                  },
+                  {
+                        "name": "Virpazar, Montenegro",
+                        "lat": 42.2467,
+                        "lon": 19.0917
+                  }
+            ],
+            "notes": "Kies één wateractiviteit en daarnaast twee of drie landstops. Zo voelt de dag rijk maar niet vol.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=Virpazar%2C%20Montenegro&destination=Virpazar%2C%20Montenegro&travelmode=driving&waypoints=Besac%20Fortress,%20Montenegro|Godinje,%20Montenegro|Murici%20Beach,%20Montenegro|Karuc,%20Montenegro",
+            "chips": [
+                  "meer",
+                  "scenic",
+                  "keuzedag"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Virpazar"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "Lokale ritten"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Virpazar → Besac → Godinje → Murići → Karuč → Virpazar"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "Tweede nacht op dezelfde plek geeft rust en ruimte om water, dorpen en uitzichten te combineren."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Kies één wateractiviteit en daarnaast twee of drie landstops. Zo voelt de dag rijk maar niet vol.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Boottocht of kajak in de ochtend</li><li>Lunch in of bij Virpazar</li><li>Scenic lus langs Godinje, Murići en Karuč</li><li>Rustig diner</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Besac Fortress</li><li>De kronkelwegen met uitzicht over het meer</li><li>Murići als fijne stop aan het water</li><li>Karuč voor sfeer en foto’s</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Wijnhuis in Crmnica</li><li>Zwemstop bij Murići</li><li>Vogels spotten tijdens boottocht</li><li>Sunset bij een viewpoint</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Langere kajaktocht</li><li>Uitgebreide scenic lus met meerdere uitzichtpunten</li><li>Combinatie van boottocht plus extra dorpentocht</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Fort, dorpen, wijnhuis en lange lunch werken prima; boottocht alleen als het prettig voelt.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Vroege ochtend is koeler en mooier</li><li>Niet alle stops willen doen</li><li>Neem cash mee voor kleine lokale stops</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Dit is een van de makkelijkste dagen om ter plekke te improviseren.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 4,
+            "date": "Di 16 juni 2026",
+            "title": "Scenic route naar de Baai van Kotor",
+            "overnight": "Perast",
+            "points": [
+                  {
+                        "name": "Virpazar, Montenegro",
+                        "lat": 42.2467,
+                        "lon": 19.0917
+                  },
+                  {
+                        "name": "Pavlova Strana Viewpoint, Montenegro",
+                        "lat": 42.3414,
+                        "lon": 19.049
+                  },
+                  {
+                        "name": "Cetinje, Montenegro",
+                        "lat": 42.3906,
+                        "lon": 18.9244
+                  },
+                  {
+                        "name": "Njegos Mausoleum, Montenegro",
+                        "lat": 42.3995,
+                        "lon": 18.8369
+                  },
+                  {
+                        "name": "Kotor Old Town, Montenegro",
+                        "lat": 42.4247,
+                        "lon": 18.7712
+                  },
+                  {
+                        "name": "Perast, Montenegro",
+                        "lat": 42.4869,
+                        "lon": 18.6981
+                  }
+            ],
+            "notes": "Vandaag is een echte roadtripdag. Houd de stops kort genoeg zodat jullie ontspannen in Perast aankomen.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=Virpazar%2C%20Montenegro&destination=Perast%2C%20Montenegro&travelmode=driving&waypoints=Pavlova%20Strana%20Viewpoint,%20Montenegro|Cetinje,%20Montenegro|Njegos%20Mausoleum,%20Montenegro|Kotor%20Old%20Town,%20Montenegro",
+            "chips": [
+                  "scenic",
+                  "UNESCO",
+                  "berg+zee"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Perast"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "2,5-3 uur netto"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Virpazar → Pavlova Strana → Cetinje → Lovćen → Kotor → Perast"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "Perast is rustiger en romantischer dan Kotor zelf, maar wel perfect in de baai gelegen."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Vandaag is een echte roadtripdag. Houd de stops kort genoeg zodat jullie ontspannen in Perast aankomen.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Vroeg vertrek uit Virpazar</li><li>Viewpointstop Pavlova Strana</li><li>Korte stop in Cetinje</li><li>Lovćen voor uitzicht</li><li>Korte wandeling in Kotor</li><li>Avond in Perast</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Pavlova Strana</li><li>Cetinje</li><li>Lovćen-panorama</li><li>Eerste blik op Kotor Bay</li><li>Avondwandeling langs de waterkant van Perast</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Njegoš Mausoleum</li><li>Koffiestop in Cetinje</li><li>Foto’s in Kotor old town</li><li>Dinner with a view in Perast</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Uitgebreidere stop in Lovćen</li><li>Meer tijd in Kotor old town</li><li>Na aankomst nog een boottochtje in Perast</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Bij lage bewolking Lovćen inkorten en juist meer tijd in Kotor of Perast steken.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Vertrek op tijd</li><li>Parkeren in Kotor kost extra tijd</li><li>Laat hotel in Perast parking vooraf bevestigen</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Maak dit een mooie route-dag, geen grote activiteiten-dag.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 5,
+            "date": "Wo 17 juni 2026",
+            "title": "Erfgoeddag in de Baai van Kotor",
+            "overnight": "Perast",
+            "points": [
+                  {
+                        "name": "Perast, Montenegro",
+                        "lat": 42.4869,
+                        "lon": 18.6981
+                  },
+                  {
+                        "name": "Risan Roman Mosaics, Montenegro",
+                        "lat": 42.5155,
+                        "lon": 18.695
+                  },
+                  {
+                        "name": "Kotor Old Town, Montenegro",
+                        "lat": 42.4247,
+                        "lon": 18.7712
+                  },
+                  {
+                        "name": "Dobrota, Montenegro",
+                        "lat": 42.4542,
+                        "lon": 18.7686
+                  },
+                  {
+                        "name": "Perast, Montenegro",
+                        "lat": 42.4869,
+                        "lon": 18.6981
+                  }
+            ],
+            "notes": "Doe vandaag vooral de klassieke highlights rustig en in logische volgorde: Perast, bootje, Kotor en daarna terug naar rust.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=Perast%2C%20Montenegro&destination=Perast%2C%20Montenegro&travelmode=driving&waypoints=Risan%20Roman%20Mosaics,%20Montenegro|Kotor%20Old%20Town,%20Montenegro|Dobrota,%20Montenegro",
+            "chips": [
+                  "UNESCO",
+                  "cultuur",
+                  "kust"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Perast"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "Korte lokale ritten"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Perast → Risan → Kotor → Dobrota → Perast"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "Jullie slapen al op de mooiste rustige plek in de baai en kunnen van daaruit makkelijk de UNESCO-zone verkennen."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Doe vandaag vooral de klassieke highlights rustig en in logische volgorde: Perast, bootje, Kotor en daarna terug naar rust.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Perast in de ochtend</li><li>Bootje naar Our Lady of the Rocks</li><li>Korte stop Risan</li><li>Lunch of namiddag in Kotor</li><li>Terug via Dobrota</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Perast zelf</li><li>Our Lady of the Rocks</li><li>Kotor old town</li><li>Risan Roman Mosaics</li><li>Dobrota-promenade</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Boottochtje door de baai</li><li>Kathedraal of maritiem museum in Kotor</li><li>Terras aan het water in Perast</li><li>Zwempauze als het warm is</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Extra klim naar een viewpoint boven Kotor als het goed voelt</li><li>Meer tijd te voet in Kotor</li><li>Lange namiddagwandeling langs Dobrota</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Perfecte dag voor Kotor old town, musea, kerken en lange lunch.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Ga vroeg naar Kotor</li><li>Perast is fijner voor ontbijt of diner dan midden op de dag</li><li>Houd middagruimte vrij voor spontane keuze</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Dit is een ideale klassieke baaidag: compact, afwisselend en makkelijk aanpasbaar.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 6,
+            "date": "Do 18 juni 2026",
+            "title": "Baai van Kotor rustige extra dag",
+            "overnight": "Perast",
+            "points": [
+                  {
+                        "name": "Perast, Montenegro",
+                        "lat": 42.4869,
+                        "lon": 18.6981
+                  },
+                  {
+                        "name": "Kotor Cable Car, Montenegro",
+                        "lat": 42.401,
+                        "lon": 18.7948
+                  },
+                  {
+                        "name": "Kotor Old Town, Montenegro",
+                        "lat": 42.4247,
+                        "lon": 18.7712
+                  },
+                  {
+                        "name": "Morinj, Montenegro",
+                        "lat": 42.4908,
+                        "lon": 18.646
+                  },
+                  {
+                        "name": "Perast, Montenegro",
+                        "lat": 42.4869,
+                        "lon": 18.6981
+                  }
+            ],
+            "notes": "Maak hier een mooie halve dag van en houd bewust veel vrije ruimte over voor zwemmen, lunchen en niets moeten.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=Perast%2C%20Montenegro&destination=Perast%2C%20Montenegro&travelmode=driving&waypoints=Kotor%20Cable%20Car,%20Montenegro|Kotor%20Old%20Town,%20Montenegro|Morinj,%20Montenegro",
+            "chips": [
+                  "relaxed",
+                  "uitzicht",
+                  "water"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Perast"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "Lokaal"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Perast → Kotor Cable Car → Kotor → Morinj → Perast"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "Met 4 nachten aan de baai krijgt deze plek echt de tijd die hij verdient zonder haast."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Maak hier een mooie halve dag van en houd bewust veel vrije ruimte over voor zwemmen, lunchen en niets moeten.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Rustige ochtend in Perast</li><li>Optioneel cable car of uitzichtstop</li><li>Lichte lunch</li><li>Middag in Morinj of aan het water</li><li>Diner in Perast</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>De baai bij ochtendlicht</li><li>Cable car-uitzicht of ander hoog panoramapunt</li><li>Morinj of ander rustig baaistrandje</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Kabelbaan</li><li>Bootje huren voor een kort rondje</li><li>Zwemplaats zoeken</li><li>Lange lunch met uitzicht</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Cable car plus extra wandeling boven</li><li>Meer tijd op het water</li><li>Kleine roadtrip langs rustige baaiplekken</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Hou het bij Kotor old town, cafés, lunch en hotelmiddag.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Laat de dag niet dichtslibben met opties</li><li>Kies hoogstens één echte activiteit</li><li>Gebruik de middag als rustmoment</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Dit is de luxe van een langere reis: niet alles hoeft een volle excursiedag te zijn.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 7,
+            "date": "Vr 19 juni 2026",
+            "title": "Extra baaidag met keuzevrijheid",
+            "overnight": "Perast",
+            "points": [
+                  {
+                        "name": "Perast, Montenegro",
+                        "lat": 42.4869,
+                        "lon": 18.6981
+                  },
+                  {
+                        "name": "Herceg Novi, Montenegro",
+                        "lat": 42.4531,
+                        "lon": 18.5375
+                  },
+                  {
+                        "name": "Rose, Montenegro",
+                        "lat": 42.4245,
+                        "lon": 18.5586
+                  },
+                  {
+                        "name": "Perast, Montenegro",
+                        "lat": 42.4869,
+                        "lon": 18.6981
+                  }
+            ],
+            "notes": "Gebruik deze dag voor een sfeeruitstap of juist als pure rustdag. Dat maakt de overgang naar de bergen morgen fijner.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=Perast%2C%20Montenegro&destination=Perast%2C%20Montenegro&travelmode=driving&waypoints=Herceg%20Novi,%20Montenegro|Rose,%20Montenegro",
+            "chips": [
+                  "extra dag",
+                  "sfeer",
+                  "kust"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Perast"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "Lokaal of 1-2 uur totaal"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Perast → Herceg Novi → Rose / Luštica-optie → Perast"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "In plaats van flexdagen gebruiken we deze extra tijd nu echt voor verdieping aan zee en in de baai."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Gebruik deze dag voor een sfeeruitstap of juist als pure rustdag. Dat maakt de overgang naar de bergen morgen fijner.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Keuze tussen rustige ochtend in Perast of rit naar Herceg Novi</li><li>Lunch aan zee</li><li>Terug voor relaxte avond in Perast</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Perast in alle rust</li><li>Eventueel Herceg Novi als andere baaisfeer</li><li>Kleine strandjes of uitkijkpunten op Luštica</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Herceg Novi old town</li><li>Korte boottrip</li><li>Lunch in Rose of op Luštica</li><li>Volledige rustdag aan het hotel</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Lange promenadewandeling in Herceg Novi</li><li>Boottocht richting Blue Cave-gebied als zee rustig is</li><li>Kleine kustroadtrip via meerdere baaihoeken</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Hou het dicht bij Perast of ga voor een korte stadswandeling en lange lunch in Herceg Novi.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Niet alles combineren</li><li>Morgen gaat de reis de bergen in, dus laat dit een fijne afbouw van de kustfase zijn</li><li>Vandaag kan ook dienen als was- of rustmoment</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Zie dit als verdiepingsdag, niet als ‘nog snel iets afvinken’-dag.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 8,
+            "date": "Za 20 juni 2026",
+            "title": "Van kust naar bergen",
+            "overnight": "Žabljak",
+            "points": [
+                  {
+                        "name": "Perast, Montenegro",
+                        "lat": 42.4869,
+                        "lon": 18.6981
+                  },
+                  {
+                        "name": "Nikšić, Montenegro",
+                        "lat": 42.7731,
+                        "lon": 18.9445
+                  },
+                  {
+                        "name": "Žabljak, Montenegro",
+                        "lat": 43.1555,
+                        "lon": 19.1226
+                  }
+            ],
+            "notes": "Maak hier vooral een prettige verplaatsingsdag van. Een koffiestop onderweg is genoeg.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=Perast%2C%20Montenegro&destination=%C5%BDabljak%2C%20Montenegro&travelmode=driving&waypoints=Nik%C5%A1i%C4%87,%20Montenegro",
+            "chips": [
+                  "bergen",
+                  "transfer",
+                  "koeler"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Žabljak"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "2,5-3 uur"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Perast → Nikšić → Žabljak"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "Een relatief directe overgangsdag zodat jullie nog energie overhouden voor de eerste bergavond."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Maak hier vooral een prettige verplaatsingsdag van. Een koffiestop onderweg is genoeg.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Vertrek uit Perast</li><li>Koffiestop in Nikšić</li><li>Aankomst in Žabljak</li><li>Korte avondwandeling bij Black Lake of gewoon rust</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Landschapswissel van zee naar hoogland</li><li>Eerste frisse berglucht in Žabljak</li><li>Black Lake bij zacht avondlicht</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Korte koffie in Nikšić</li><li>Vroege check-in en lodge-tijd</li><li>Makkelijke boswandeling bij aankomst</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Extra stop bij een meer of viewpoint onderweg</li><li>Korte loop om Black Lake na aankomst</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Maak er puur een transferdag van en geniet van hotel, uitzicht en goed eten.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Warme laag meenemen; het is hier vaak veel koeler</li><li>Doe boodschappen voor de bergdagen</li><li>Reserveer diner als jullie buiten het dorp slapen</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Vandaag gaat het om soepel aankomen in de bergen, niet om veel stops.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 9,
+            "date": "Zo 21 juni 2026",
+            "title": "Durmitor rustig verkennen",
+            "overnight": "Žabljak",
+            "points": [
+                  {
+                        "name": "Žabljak, Montenegro",
+                        "lat": 43.1555,
+                        "lon": 19.1226
+                  },
+                  {
+                        "name": "Crno Jezero, Montenegro",
+                        "lat": 43.1461,
+                        "lon": 19.093
+                  },
+                  {
+                        "name": "Curevac viewpoint, Montenegro",
+                        "lat": 43.1905,
+                        "lon": 19.0865
+                  },
+                  {
+                        "name": "Žabljak, Montenegro",
+                        "lat": 43.1555,
+                        "lon": 19.1226
+                  }
+            ],
+            "notes": "Houd het eenvoudig: Black Lake, een uitzichtpunt en een lange lunch of rustblok.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=%C5%BDabljak%2C%20Montenegro&destination=%C5%BDabljak%2C%20Montenegro&travelmode=driving&waypoints=Crno%20Jezero,%20Montenegro|Curevac%20viewpoint,%20Montenegro",
+            "chips": [
+                  "bergmeer",
+                  "easy hike",
+                  "uitzicht"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Žabljak"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "Kort lokaal"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Žabljak → Black Lake → Curevac → Žabljak"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "Eerste echte bergdag moet makkelijk en mooi zijn, zodat jullie voelen wat de plek nodig heeft qua energie en weer."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Houd het eenvoudig: Black Lake, een uitzichtpunt en een lange lunch of rustblok.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Black Lake in de ochtend</li><li>Lunch of rust</li><li>Curevac viewpoint of korte boswandeling</li><li>Vroege avond in Žabljak</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Black Lake</li><li>Bosranden en bergspiegels in het water</li><li>Curevac viewpoint richting Tara-canyon</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Bootje op Black Lake als beschikbaar</li><li>Korte nature walk</li><li>Lunchen met bergzicht</li><li>Herten of vogels spotten in de rustige uren</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Volledige rondwandeling Black Lake plus extra pad</li><li>Langer naar Curevac</li><li>Extra bos- of meadow-wandeling</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Black Lake kan ook in mist mooi zijn; verder vooral korte stops en een hotelmiddag.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Start vroeg voor het mooiste licht</li><li>Regenjack en laagjes mee</li><li>Kies vandaag nog geen zware hike</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Vandaag is bedoeld om de bergfase rustig te openen.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 10,
+            "date": "Ma 22 juni 2026",
+            "title": "Durmitor panoramadag",
+            "overnight": "Žabljak",
+            "points": [
+                  {
+                        "name": "Žabljak, Montenegro",
+                        "lat": 43.1555,
+                        "lon": 19.1226
+                  },
+                  {
+                        "name": "Sedlo Pass, Montenegro",
+                        "lat": 43.1002,
+                        "lon": 18.9956
+                  },
+                  {
+                        "name": "Trsa, Montenegro",
+                        "lat": 43.2158,
+                        "lon": 18.9441
+                  },
+                  {
+                        "name": "Žabljak, Montenegro",
+                        "lat": 43.1555,
+                        "lon": 19.1226
+                  }
+            ],
+            "notes": "Ga vandaag voor panorama’s en korte wandelingen in plaats van één grote uitputtende tocht.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=%C5%BDabljak%2C%20Montenegro&destination=%C5%BDabljak%2C%20Montenegro&travelmode=driving&waypoints=Sedlo%20Pass,%20Montenegro|Trsa,%20Montenegro",
+            "chips": [
+                  "panorama",
+                  "scenic drive",
+                  "bergen"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Žabljak"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "Scenic dag, kort-middelmatig"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Žabljak → Sedlo Pass → Trsa-optie → Žabljak"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "Nu is er tijd voor de mooiste wegstukken van Durmitor zonder gehaast."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Ga vandaag voor panorama’s en korte wandelingen in plaats van één grote uitputtende tocht.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Scenic rit richting Sedlo</li><li>Korte fotostops en kleine wandelingen</li><li>Lunch onderweg of picknick</li><li>Terug via dezelfde of vergelijkbare route</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Sedlo Pass</li><li>De enorme open berglandschappen</li><li>Grashellingen, pieken en haarspeldwegen</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Picknick met uitzicht</li><li>Korte meadow-wandeling</li><li>Terras in de middag terug in Žabljak</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Lange wandeling op een eenvoudig bergpad</li><li>Extra stukken van de Durmitor Ring</li><li>Meer stops en kleine trailtjes</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Bij slecht zicht deze dag omzetten naar café/lunch en alleen korte stukken rijden als de wolken openbreken.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Tank op tijd</li><li>Neem snacks en water mee</li><li>Telefoonbereik kan wisselen op bergwegen</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Gebruik deze dag voor landschap en gevoel van ruimte; dat is hier de echte hoofdact.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 11,
+            "date": "Di 23 juni 2026",
+            "title": "Tara Canyon dag",
+            "overnight": "Žabljak",
+            "points": [
+                  {
+                        "name": "Žabljak, Montenegro",
+                        "lat": 43.1555,
+                        "lon": 19.1226
+                  },
+                  {
+                        "name": "Đurđevića Tara Bridge, Montenegro",
+                        "lat": 43.1512,
+                        "lon": 19.2919
+                  },
+                  {
+                        "name": "Žabljak, Montenegro",
+                        "lat": 43.1555,
+                        "lon": 19.1226
+                  }
+            ],
+            "notes": "Maak van vandaag een canyon- en uitzichtdag. Jullie hoeven hier niet per se iets avontuurlijks te boeken om het de moeite waard te maken.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=%C5%BDabljak%2C%20Montenegro&destination=%C5%BDabljak%2C%20Montenegro&travelmode=driving&waypoints=%C4%90ur%C4%91evi%C4%87a%20Tara%20Bridge,%20Montenegro",
+            "chips": [
+                  "canyon",
+                  "viewpoints",
+                  "keuzedag"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Žabljak"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "1,5-2,5 uur totaal afhankelijk van keuzes"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Žabljak → Đurđevića Tara Bridge → omliggende viewpoints → Žabljak"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "Met vier nachten in Žabljak kunnen jullie ook de canyonkant goed meepakken."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Maak van vandaag een canyon- en uitzichtdag. Jullie hoeven hier niet per se iets avontuurlijks te boeken om het de moeite waard te maken.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Rit naar Tara Bridge</li><li>Bridge en canyon bekijken</li><li>Lunch of koffie</li><li>Optioneel extra viewpoint of korte nature stop</li><li>Terug naar Žabljak</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Đurđevića Tara Bridge</li><li>Canyonuitzichten</li><li>Rivierlandschap en open hoogvlaktes onderweg</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Koffie met canyonuitzicht</li><li>Korte wandeling bij de bridge</li><li>Foto’s en picknick</li><li>Extra viewpoint onderweg</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Zipline alleen als jullie daar echt zin in hebben en het passend voelt</li><li>Langere wandeling in de omgeving</li><li>Combinatie met extra canyon-roadtrip</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Dan werkt deze dag nog steeds als scenic rit, maar houd de stops kort en veilig.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Rij vroeg voor rustiger foto’s</li><li>Laat mogelijke avontuur-opties helemaal afhangen van hoe het voelt</li><li>Neem een extra laag mee, het kan fris zijn</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Vandaag mag best spectaculair ogen zonder dat hij lichamelijk zwaar hoeft te zijn.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 12,
+            "date": "Wo 24 juni 2026",
+            "title": "Scenic rit naar Sutjeska",
+            "overnight": "Tjentište",
+            "points": [
+                  {
+                        "name": "Žabljak, Montenegro",
+                        "lat": 43.1555,
+                        "lon": 19.1226
+                  },
+                  {
+                        "name": "Piva Lake Viewpoint, Montenegro",
+                        "lat": 43.1238,
+                        "lon": 18.846
+                  },
+                  {
+                        "name": "Piva Monastery, Montenegro",
+                        "lat": 43.1067,
+                        "lon": 18.8174
+                  },
+                  {
+                        "name": "Tjentište, Bosnia and Herzegovina",
+                        "lat": 43.607,
+                        "lon": 18.747
+                  }
+            ],
+            "notes": "Maak dit een fotogenieke transferdag. Niet te veel stops, maar wel de mooiste meegrijpen.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=%C5%BDabljak%2C%20Montenegro&destination=Tjenti%C5%A1te%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Piva%20Lake%20Viewpoint,%20Montenegro|Piva%20Monastery,%20Montenegro",
+            "chips": [
+                  "scenic",
+                  "meer",
+                  "grensdag"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Tjentište"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "3-4 uur met stops"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Žabljak → Piva Lake viewpoint → Piva Monastery → Tjentište"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "Door via Piva te rijden krijgt deze verplaatsingsdag echt inhoud in plaats van alleen kilometers."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Maak dit een fotogenieke transferdag. Niet te veel stops, maar wel de mooiste meegrijpen.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Vertrek uit Žabljak</li><li>Stop bij Piva Lake viewpoints</li><li>Optioneel Piva Monastery</li><li>Door naar Tjentište</li><li>Rustige avond</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Piva-kloof en turquoise water</li><li>Piva Monastery als cultuurbreak</li><li>Aankomst in ruiger Bosnisch berglandschap</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Korte koffiestop bij Piva</li><li>Lunch met uitzicht</li><li>Kleine wandeling bij een viewpoint</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Meer fotostops langs het Piva-meer</li><li>Kleine extra omweg als het weer fantastisch is</li><li>Avondwandeling rond Tjentište</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Bij regen gewoon minder stoppen en focus op aankomst.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Neem vandaag genoeg snacks mee</li><li>Grens kan even duren, houd marge</li><li>Boek Tjentište op een plek met goed diner of half pension</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Dit is geen pure hotelwisseldag; Piva maakt hem de moeite waard.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 13,
+            "date": "Do 25 juni 2026",
+            "title": "Sutjeska ochtend en door naar Sarajevo",
+            "overnight": "Sarajevo",
+            "points": [
+                  {
+                        "name": "Tjentište, Bosnia and Herzegovina",
+                        "lat": 43.607,
+                        "lon": 18.747
+                  },
+                  {
+                        "name": "Valley of Heroes Memorial Park, Tjentište",
+                        "lat": 43.6065,
+                        "lon": 18.7475
+                  },
+                  {
+                        "name": "Prijevor, Bosnia and Herzegovina",
+                        "lat": 43.333,
+                        "lon": 18.7
+                  },
+                  {
+                        "name": "Sarajevo, Bosnia and Herzegovina",
+                        "lat": 43.8563,
+                        "lon": 18.4131
+                  }
+            ],
+            "notes": "Doe in de ochtend één of twee dingen goed en vertrek daarna op tijd naar Sarajevo.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=Tjenti%C5%A1te%2C%20Bosnia%20and%20Herzegovina&destination=Sarajevo%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Valley%20of%20Heroes%20Memorial%20Park,%20Tjenti%C5%A1te|Prijevor,%20Bosnia%20and%20Herzegovina",
+            "chips": [
+                  "natuur+stad",
+                  "overgang",
+                  "geschiedenis"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Sarajevo"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "2,5-3 uur totaal"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Tjentište → Valley of Heroes → Prijevor-optie → Sarajevo"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "Eén nacht is genoeg om de sfeer van Sutjeska mee te krijgen zonder de reis onnodig afgelegen te maken."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Doe in de ochtend één of twee dingen goed en vertrek daarna op tijd naar Sarajevo.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Korte ochtendstop bij Valley of Heroes</li><li>Optioneel uitkijkpunt of korte natuurstop</li><li>Rit naar Sarajevo</li><li>Avond in de oude stad</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Valley of Heroes memorial</li><li>Het gevoel van ruimte in Sutjeska</li><li>Eerste sfeer van Sarajevo in de avond</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Koffie voor vertrek in Tjentište</li><li>Eerste wandeling door Baščaršija</li><li>Bosnisch diner in Sarajevo</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Prijevor viewpoint als het weer helder is</li><li>Iets langere natuurstop voor vertrek</li><li>Na aankomst nog een avondwandeling door meerdere wijken</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Laat Prijevor vallen en rij eerder door; Sarajevo is juist een goede regenstad.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Niet te laat vertrekken uit Sutjeska</li><li>Gebruik Sarajevo avond vooral voor sfeer, niet voor museummarathon</li><li>Parkeer slim bij hotel</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>De winst zit hier in de combinatie van ruige ochtend en levendige avondstad.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 14,
+            "date": "Vr 26 juni 2026",
+            "title": "Sarajevo volle dag",
+            "overnight": "Sarajevo",
+            "points": [
+                  {
+                        "name": "Sarajevo, Bosnia and Herzegovina",
+                        "lat": 43.8563,
+                        "lon": 18.4131
+                  },
+                  {
+                        "name": "Baščaršija, Sarajevo",
+                        "lat": 43.8595,
+                        "lon": 18.43
+                  },
+                  {
+                        "name": "Latin Bridge, Sarajevo",
+                        "lat": 43.8575,
+                        "lon": 18.4289
+                  },
+                  {
+                        "name": "Tunnel of Hope, Sarajevo",
+                        "lat": 43.8222,
+                        "lon": 18.3364
+                  },
+                  {
+                        "name": "Sarajevo, Bosnia and Herzegovina",
+                        "lat": 43.8563,
+                        "lon": 18.4131
+                  }
+            ],
+            "notes": "Houd de dag compact: oude stad, één grotere inhoudelijke plek, goed eten en genoeg koffietijd.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=Sarajevo%2C%20Bosnia%20and%20Herzegovina&destination=Sarajevo%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Ba%C5%A1%C4%8Dar%C5%A1ija,%20Sarajevo|Latin%20Bridge,%20Sarajevo|Tunnel%20of%20Hope,%20Sarajevo",
+            "chips": [
+                  "stad",
+                  "cultuur",
+                  "food"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Sarajevo"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "Geen of lokaal"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Sarajevo te voet / tram / taxi"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "Twee nachten is precies goed om de stad serieus te voelen maar niet te lang uit de natuurflow te blijven."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Houd de dag compact: oude stad, één grotere inhoudelijke plek, goed eten en genoeg koffietijd.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Baščaršija</li><li>Latin Bridge en oude kern</li><li>Lunch/koffie</li><li>Tunnel of Hope of museum</li><li>Avondwandeling en diner</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Baščaršija</li><li>Sebilj en omringende straatjes</li><li>Latin Bridge</li><li>Een plek die de moderne geschiedenis goed laat voelen</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Koffiehuizen</li><li>Kleine musea</li><li>Kabelbaan of Trebević als rustig uitzichtprogramma</li><li>Baklava of cevapi-stop</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Trebević erbij</li><li>Langere stadswandeling door verschillende wijken</li><li>Meerdere musea of uitzichtpunten combineren</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Sarajevo is ideaal voor een regenversie: musea, koffiehuizen, Tunnel of Hope en lange lunch.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Plan niet te veel losse punten</li><li>Laat ruimte voor sfeer in plaats van checklist</li><li>Avond is prachtig in de oude stad</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Sarajevo is een stad om te voelen, niet om in hoog tempo af te werken.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 15,
+            "date": "Za 27 juni 2026",
+            "title": "Door de Neretva-vallei naar Mostar",
+            "overnight": "Mostar",
+            "points": [
+                  {
+                        "name": "Sarajevo, Bosnia and Herzegovina",
+                        "lat": 43.8563,
+                        "lon": 18.4131
+                  },
+                  {
+                        "name": "Konjic, Bosnia and Herzegovina",
+                        "lat": 43.6519,
+                        "lon": 17.9614
+                  },
+                  {
+                        "name": "Jablanica, Bosnia and Herzegovina",
+                        "lat": 43.6608,
+                        "lon": 17.761
+                  },
+                  {
+                        "name": "Mostar, Bosnia and Herzegovina",
+                        "lat": 43.3438,
+                        "lon": 17.8078
+                  }
+            ],
+            "notes": "Maak van de rit naar Mostar een halve daguitstap met twee fijne stops en geen gehaaste aankomst.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=Sarajevo%2C%20Bosnia%20and%20Herzegovina&destination=Mostar%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Konjic,%20Bosnia%20and%20Herzegovina|Jablanica,%20Bosnia%20and%20Herzegovina",
+            "chips": [
+                  "roadtrip",
+                  "rivier",
+                  "UNESCO"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Mostar"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "2,5-3 uur met stops"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Sarajevo → Konjic → Jablanica → Mostar"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "De route zelf is al een highlight, dus hier wil je tijd voor houden in plaats van doordenderen."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Maak van de rit naar Mostar een halve daguitstap met twee fijne stops en geen gehaaste aankomst.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Vertrek uit Sarajevo</li><li>Stop in Konjic</li><li>Tweede stop in Jablanica</li><li>Rit door naar Mostar</li><li>Avondwandeling in Mostar</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Konjic old bridge</li><li>Neretva-vallei</li><li>Jablanica als historische stop</li><li>Eerste avondzicht op de Stari Most</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Lunch aan de rivier</li><li>Koffie in Konjic</li><li>Mostar bij golden hour</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Extra stop bij een uitzichtpunt langs de Neretva</li><li>Langere wandeling bij aankomst in Mostar</li><li>Meer tijd voor oude stad en omliggende steegjes</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Deze dag werkt prima bij regen; juist de rit en lunch maken hem dan goed.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Rijd niet te laat weg</li><li>Mostar is heet in juni, dus golden hour is fijner dan middag</li><li>Kies hotel met parking dicht bij de oude stad</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Vandaag is de vallei de hoofdrolspeler en Mostar de perfecte finale.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 16,
+            "date": "Zo 28 juni 2026",
+            "title": "Klassieke Herzegovina-loop",
+            "overnight": "Mostar",
+            "points": [
+                  {
+                        "name": "Mostar, Bosnia and Herzegovina",
+                        "lat": 43.3438,
+                        "lon": 17.8078
+                  },
+                  {
+                        "name": "Blagaj Tekke, Bosnia and Herzegovina",
+                        "lat": 43.2582,
+                        "lon": 17.8887
+                  },
+                  {
+                        "name": "Počitelj, Bosnia and Herzegovina",
+                        "lat": 43.1341,
+                        "lon": 17.7327
+                  },
+                  {
+                        "name": "Kravica Waterfall, Bosnia and Herzegovina",
+                        "lat": 43.1575,
+                        "lon": 17.606
+                  },
+                  {
+                        "name": "Mostar, Bosnia and Herzegovina",
+                        "lat": 43.3438,
+                        "lon": 17.8078
+                  }
+            ],
+            "notes": "Doe liever twee of drie stops goed dan alles snel. In de hitte is rust tussen de stops goud waard.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=Mostar%2C%20Bosnia%20and%20Herzegovina&destination=Mostar%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Blagaj%20Tekke,%20Bosnia%20and%20Herzegovina|Po%C4%8Ditelj,%20Bosnia%20and%20Herzegovina|Kravica%20Waterfall,%20Bosnia%20and%20Herzegovina",
+            "chips": [
+                  "UNESCO-omgeving",
+                  "dorpen",
+                  "waterval"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Mostar"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "Korte tot middelmatige lokale ritten"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Mostar → Blagaj → Počitelj → Kravica → Mostar"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "Jullie hebben drie nachten in Mostar, dus deze dag kan gewoon de klassieke highlights pakken."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Doe liever twee of drie stops goed dan alles snel. In de hitte is rust tussen de stops goud waard.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Blagaj in de ochtend</li><li>Počitelj tegen late ochtend</li><li>Lunch</li><li>Kravica als laatste of alleen als het goed voelt</li><li>Terug naar Mostar</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Blagaj Tekke</li><li>Počitelj</li><li>Kravica-waterfall als natuurslot</li><li>Mostar in de avond</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Boot of rivierzicht in Blagaj</li><li>Dwalen door Počitelj</li><li>Zwemmen bij Kravica als het warm is</li><li>Late cocktail met zicht op Mostar</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Alle drie de stops ruim doen</li><li>Extra wandeling in Počitelj</li><li>Lange namiddag in Kravica</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Blagaj en Mostar werken beter dan Kravica in regen; houd de dag dan korter.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Ga vroeg naar Blagaj en Počitelj</li><li>Kravica liever later op de dag of overslaan bij weinig energie</li><li>Neem slippers of waterschoenen mee als zwemmen aantrekkelijk is</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Dit is jullie klassieke Herzegovina-ansichtkaartdag.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 17,
+            "date": "Ma 29 juni 2026",
+            "title": "Diepere Herzegovina-dag",
+            "overnight": "Mostar",
+            "points": [
+                  {
+                        "name": "Mostar, Bosnia and Herzegovina",
+                        "lat": 43.3438,
+                        "lon": 17.8078
+                  },
+                  {
+                        "name": "Stolac, Bosnia and Herzegovina",
+                        "lat": 43.0844,
+                        "lon": 17.9575
+                  },
+                  {
+                        "name": "Mostar, Bosnia and Herzegovina",
+                        "lat": 43.3438,
+                        "lon": 17.8078
+                  }
+            ],
+            "notes": "Kies vandaag één thema: wijn en lunch, kleine historische stadjes, of gewoon een heel rustige Mostar-dag.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=Mostar%2C%20Bosnia%20and%20Herzegovina&destination=Mostar%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Stolac,%20Bosnia%20and%20Herzegovina",
+            "chips": [
+                  "slow travel",
+                  "wijn",
+                  "extra inhoud"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Mostar"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "Naar keuze kort tot middelmatig"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Mostar → wijnhuis / Stolac-optie / Buna-gebied → Mostar"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "De extra tijd wordt hier gebruikt voor een tweede, minder voorspelbare Herzegovina-dag in plaats van een flexblok."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Kies vandaag één thema: wijn en lunch, kleine historische stadjes, of gewoon een heel rustige Mostar-dag.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Rustige ochtend in Mostar</li><li>Keuze-uitstap naar wijnhuis, Stolac of Buna-gebied</li><li>Lange lunch</li><li>Vrije namiddag</li><li>Laatste avond in Mostar</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Mostar zelf buiten de piekuren</li><li>Herzegovina-landschap buiten de hoofdroute</li><li>Rustige lunchplek</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Wijnproeverij</li><li>Stolac</li><li>Nog een extra uur in Blagaj als het daar gisteren te druk was</li><li>Hotelmiddag of spa als beschikbaar</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Combinatie van wijnhuis plus Stolac</li><li>Lange wandeling door Mostar buiten de hoofdzone</li><li>Kleine roadtrip langs meerdere dorpen</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Dan is een goede lunch, café, wijnhuis of Mostar zelf de beste keuze.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Gebruik deze dag niet om nog heel veel kilometers te maken</li><li>Dit is juist jullie slow-travel dag in Herzegovina</li><li>Boek een wijnproeverij vooraf als jullie een specifieke plek willen</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Vandaag verdiept de regio in plaats van alleen nog een extra slaapnacht te zijn.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 18,
+            "date": "Di 30 juni 2026",
+            "title": "Van Mostar naar Trebinje",
+            "overnight": "Trebinje",
+            "points": [
+                  {
+                        "name": "Mostar, Bosnia and Herzegovina",
+                        "lat": 43.3438,
+                        "lon": 17.8078
+                  },
+                  {
+                        "name": "Stolac, Bosnia and Herzegovina",
+                        "lat": 43.0844,
+                        "lon": 17.9575
+                  },
+                  {
+                        "name": "Trebinje, Bosnia and Herzegovina",
+                        "lat": 42.7117,
+                        "lon": 18.3434
+                  }
+            ],
+            "notes": "Maak van vandaag een prettige overgang naar de laatste fase van de reis. Niet te veel stops, wel genoeg tijd voor Trebinje zelf.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=Mostar%2C%20Bosnia%20and%20Herzegovina&destination=Trebinje%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Stolac,%20Bosnia%20and%20Herzegovina",
+            "chips": [
+                  "nieuwe sfeer",
+                  "kleine stad",
+                  "finalefase"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Trebinje"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "2-3 uur afhankelijk van route"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Mostar → Radimlja / Stolac-optie → Trebinje"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "Trebinje voegt echt een nieuwe sfeer toe: zuidelijk, mediterraan, compact en minder toeristisch dan Mostar."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Maak van vandaag een prettige overgang naar de laatste fase van de reis. Niet te veel stops, wel genoeg tijd voor Trebinje zelf.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Vertrek uit Mostar</li><li>Eventuele korte stop onderweg</li><li>Aankomst Trebinje</li><li>Oude stad en rivier in de namiddag</li><li>Laat diner</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Trebinje old town</li><li>Rivierpromenade</li><li>Kleine pleinen en terrasjes</li><li>De andere, rustigere Herzegovina-sfeer</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Lunch in Stolac of onderweg</li><li>Wijn of koffie in Trebinje</li><li>Avondwandeling over de bruggen</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Extra stop bij Radimlja of Stolac</li><li>Langere stadswandeling in Trebinje</li><li>Rit naar een uitzichtpunt boven de stad</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Trebinje werkt ook prima voor een rustige stadsmiddag met cafés en lunch.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Kom liever vroeg aan dan laat</li><li>Trebinje is leuker als je er echt nog een middag en avond hebt</li><li>Kies hotel in of vlak bij de oude stad</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Deze dag geeft de reis een andere finale dan nog een extra grote stad of een lange transfer.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 19,
+            "date": "Wo 1 juli 2026",
+            "title": "Rustige terugrit naar Podgorica",
+            "overnight": "Podgorica",
+            "points": [
+                  {
+                        "name": "Trebinje, Bosnia and Herzegovina",
+                        "lat": 42.7117,
+                        "lon": 18.3434
+                  },
+                  {
+                        "name": "Nikšić, Montenegro",
+                        "lat": 42.7731,
+                        "lon": 18.9445
+                  },
+                  {
+                        "name": "Podgorica, Montenegro",
+                        "lat": 42.4304,
+                        "lon": 19.2594
+                  }
+            ],
+            "notes": "Vandaag hoeft niets meer groots te zijn. Een rustige rit, een lunchstop en een comfortabele laatste nacht zijn genoeg.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=Trebinje%2C%20Bosnia%20and%20Herzegovina&destination=Podgorica%2C%20Montenegro&travelmode=driving&waypoints=Nik%C5%A1i%C4%87,%20Montenegro",
+            "chips": [
+                  "easy",
+                  "terugrit",
+                  "laatste nacht"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Podgorica"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "2-3 uur"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Trebinje → Grahovo / Nikšić-optie → Podgorica"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "Door hier al terug te gaan naar Podgorica blijft de vertrekdag volledig ontspannen."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Vandaag hoeft niets meer groots te zijn. Een rustige rit, een lunchstop en een comfortabele laatste nacht zijn genoeg.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Ontbijt in Trebinje</li><li>Rit richting Montenegro</li><li>Koffie of lunchstop onderweg</li><li>Aankomst Podgorica</li><li>Auto, koffers en vertrekdag rustig voorbereiden</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Landschapswissel terug Montenegro in</li><li>Laatste Balkan-roadtripgevoel</li><li>Comfortabele laatste avond zonder reishaast</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Lunchstop in Nikšić</li><li>Korte koffie in Podgorica centrum</li><li>Goed hotel met zwembad of fijne tuin als dat past</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Kleine omweg voor lunch of viewpoint</li><li>Korte stadswandeling in Podgorica na aankomst</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Perfecte transferdag; slecht weer doet hier weinig af aan het plan.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Tank vandaag al of check tankbeleid</li><li>Leg spullen klaar voor de vlucht</li><li>Laat de avond bewust eenvoudig</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Dit is jullie ontspan-dag vóór vertrek, niet de dag om nog iets te bewijzen.</p>"
+                  }
+            ]
+      },
+      {
+            "dayNumber": 20,
+            "date": "Do 2 juli 2026",
+            "title": "Ontspannen vertrekdag",
+            "overnight": "Geen, vandaag vliegen jullie terug",
+            "points": [
+                  {
+                        "name": "Podgorica, Montenegro",
+                        "lat": 42.4304,
+                        "lon": 19.2594
+                  },
+                  {
+                        "name": "Podgorica Airport, Montenegro",
+                        "lat": 42.3594,
+                        "lon": 19.2519
+                  }
+            ],
+            "notes": "Laat deze dag leeg en ontspannen blijven. Rustig ontbijt, uitchecken en ruim op tijd naar de luchthaven.",
+            "routeLink": "https://www.google.com/maps/dir/?api=1&origin=Podgorica%2C%20Montenegro&destination=Podgorica%20Airport%2C%20Montenegro&travelmode=driving",
+            "chips": [
+                  "vertrek",
+                  "easy",
+                  "stressvrij"
+            ],
+            "metas": [
+                  {
+                        "label": "Slapen",
+                        "value": "Geen, vandaag vliegen jullie terug"
+                  },
+                  {
+                        "label": "Rijtijd",
+                        "value": "15-20 min naar luchthaven"
+                  },
+                  {
+                        "label": "Route",
+                        "value": "Podgorica → Podgorica Airport"
+                  },
+                  {
+                        "label": "Waarom deze basis",
+                        "value": "Door de laatste nacht in Podgorica te houden is er geen stress op de slotdag."
+                  }
+            ],
+            "sections": [
+                  {
+                        "title": "Mijn advies voor deze dag",
+                        "body": "<p>Laat deze dag leeg en ontspannen blijven. Rustig ontbijt, uitchecken en ruim op tijd naar de luchthaven.</p>"
+                  },
+                  {
+                        "title": "Hoofdprogramma",
+                        "body": "<ul><li>Uitslapen</li><li>Rustig ontbijt</li><li>Uitchecken</li><li>Auto inleveren</li><li>Naar de luchthaven voor vlucht van 17:40</li></ul>"
+                  },
+                  {
+                        "title": "Wat jullie onderweg of ter plekke echt moeten zien",
+                        "body": "<ul><li>Eigenlijk niets meer moeten</li><li>Misschien nog een laatste koffie of lunch als het tempo dat toelaat</li></ul>"
+                  },
+                  {
+                        "title": "Leuke dingen in de omgeving om uit te kiezen",
+                        "body": "<ul><li>Korte koffie in de stad</li><li>Rustige brunch</li><li>Niets doen en op tijd naar de luchthaven</li></ul>"
+                  },
+                  {
+                        "title": "Meer energie? Dan zijn dit leuke of actievere opties",
+                        "body": "<ul><li>Geen echte high-energy optie nodig; juist ontspannen afronden is de luxe van dit schema</li></ul>"
+                  },
+                  {
+                        "title": "Slecht weer of minder energie",
+                        "body": "<p>Niet relevant.</p>"
+                  },
+                  {
+                        "title": "Praktische tips van de dag",
+                        "body": "<ul><li>Hou marge voor auto-inleveren</li><li>Check grensdocumenten en papieren nog één keer</li><li>Vandaag geen extra stad of uitstap plannen</li></ul>"
+                  },
+                  {
+                        "title": "Zo gebruik je deze dag slim",
+                        "body": "<p>Dit is de dag waarop jullie voelen dat het schema echt goed in elkaar zat.</p>"
+                  }
+            ]
+      }
+];
+    const tuesdayShortcut = {"date": "Di 30 jun 2026", "title": "Dinsdag-alternatief: direct naar TGD", "overnight": "Vlucht terug", "points": [{"name": "Perast", "lat": 42.4869, "lon": 18.6981}, {"name": "Podgorica Airport (TGD)", "lat": 42.3594, "lon": 19.2519}], "notes": "Gebruik deze in plaats van de laatste 3 etappes als jullie de dinsdagvlucht nemen."};
+    const colors = ["#1d4ed8", "#047857", "#b91c1c", "#7c3aed", "#ea580c", "#0f766e", "#4f46e5", "#0891b2", "#65a30d", "#c026d3", "#0369a1", "#be123c", "#0f766e", "#9333ea", "#ca8a04", "#334155", "#dc2626", "#2563eb", "#16a34a", "#475569"];
+
+    const map = L.map('map', { preferCanvas: true }).setView([42.95, 18.9], 8);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    const dayLayers = [];
+    const allBounds = L.latLngBounds([]);
+    let tuesdayLayer = null;
+
+    function pointsToCoords(points) {
+      return points.map(p => [p.lon, p.lat]).join(';');
+    }
+
+    async function fetchRoadGeometry(points) {
+      if (points.length < 2) return null;
+      const coords = pointsToCoords(points);
+      const url = `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson&steps=false`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.routes && data.routes[0] && data.routes[0].geometry) return data.routes[0].geometry.coordinates;
+      } catch (e) { }
+      return null;
+    }
+
+    function addMarkers(points, layer, color, startIndex) {
+      points.forEach((p, idx) => {
+        const n = startIndex + idx + 1;
+        const marker = L.circleMarker([p.lat, p.lon], {
+          radius: idx === 0 || idx === points.length - 1 ? 6.5 : 5,
+          color: color,
+          weight: 2,
+          fillColor: '#ffffff',
+          fillOpacity: 1
+        }).bindPopup(`<strong>${p.name}</strong><br>Stop ${n}`);
+        marker.addTo(layer);
+        allBounds.extend([p.lat, p.lon]);
+      });
+    }
+
+    async function buildDay(day, index) {
+      const color = colors[index % colors.length];
+      const group = L.layerGroup();
+      const road = await fetchRoadGeometry(day.points);
+      if (road && road.length) {
+        const latlngs = road.map(c => [c[1], c[0]]);
+        L.polyline(latlngs, { color, weight: 5, opacity: 0.82 }).addTo(group);
+        latlngs.forEach(ll => allBounds.extend(ll));
+      } else if (day.points.length >= 2) {
+        L.polyline(day.points.map(p => [p.lat, p.lon]), { color, weight: 4, opacity: 0.55 }).addTo(group);
+      }
+      addMarkers(day.points, group, color, 0);
+      dayLayers.push({ group, day, color });
+      group.addTo(map);
+    }
+
+    async function buildTuesday() {
+      const group = L.layerGroup();
+      const road = await fetchRoadGeometry(tuesdayShortcut.points);
+      const color = '#dc2626';
+      if (road && road.length) {
+        const latlngs = road.map(c => [c[1], c[0]]);
+        L.polyline(latlngs, { color, weight: 5, opacity: 0.9, dashArray: '10 8' }).addTo(group);
+      } else {
+        L.polyline(tuesdayShortcut.points.map(p => [p.lat, p.lon]), { color, weight: 4, opacity: 0.8, dashArray: '10 8' }).addTo(group);
+      }
+      tuesdayShortcut.points.forEach((p) => {
+        L.circleMarker([p.lat, p.lon], { radius: 6, color, weight: 2, fillColor: '#fff', fillOpacity: 1 }).bindPopup(`<strong>${p.name}</strong><br>Dinsdag alternatief`).addTo(group);
+      });
+      tuesdayLayer = group;
+      group.addTo(map);
+    }
+
+    function renderList() {
+      const el = document.getElementById('daylist');
+      el.innerHTML = '';
+      days.forEach((day, idx) => {
+        const card = document.createElement('article');
+        card.className = 'day';
+        const routeHtml = day.points.map(p => `<li>${p.name}</li>`).join('');
+        const chipsHtml = day.chips.map(chip => `<span class="chip">${chip}</span>`).join('');
+        const factsHtml = day.metas.map(meta => `<div class="fact"><strong>${meta.label}</strong>${meta.value}</div>`).join('');
+        const sectionsHtml = day.sections.map(section => `
+          <section class="advice">
+            <h4>${section.title}</h4>
+            ${section.body}
+          </section>
+        `).join('');
+        card.innerHTML = `
+          <button class="day-main" type="button">
+            <h3><span class="swatch" style="background:${colors[idx % colors.length]}"></span>Dag ${day.dayNumber}: ${day.title}</h3>
+            <div class="meta">${day.date}</div>
+            <div class="pill">Slapen in ${day.overnight}</div>
+            <div class="chips">${chipsHtml}</div>
+            <div class="mini">${day.notes}</div>
+            <ol class="route">${routeHtml}</ol>
+          </button>
+          <details class="day-details">
+            <summary>Inzichten, tips en keuzes voor deze dag</summary>
+            <div class="facts">${factsHtml}</div>
+            <div class="advice-grid">${sectionsHtml}</div>
+            <a class="maplink" href="${day.routeLink}" target="_blank" rel="noopener">Open dagroute in Google Maps</a>
+          </details>
+        `;
+        card.querySelector('.day-main').addEventListener('click', () => focusDay(idx));
+        el.appendChild(card);
+      });
+    }
+
+    function focusDay(idx) {
+      dayLayers.forEach((obj, i) => {
+        if (map.hasLayer(obj.group)) map.removeLayer(obj.group);
+        if (i === idx) obj.group.addTo(map);
+      });
+      if (tuesdayLayer && map.hasLayer(tuesdayLayer)) map.removeLayer(tuesdayLayer);
+      const bounds = L.latLngBounds([]);
+      const points = dayLayers[idx].day.points;
+      points.forEach(p => bounds.extend([p.lat, p.lon]));
+      map.invalidateSize();
+      map.fitBounds(bounds.pad(0.25));
+    }
+
+    function showAll() {
+      dayLayers.forEach(obj => obj.group.addTo(map));
+      fitAll();
+    }
+
+    function showTuesday() {
+      dayLayers.forEach((obj, idx) => {
+        const keep = idx <= 16; // tot en met Perast op 29 juni
+        if (keep) obj.group.addTo(map); else if (map.hasLayer(obj.group)) map.removeLayer(obj.group);
+      });
+      if (tuesdayLayer && !map.hasLayer(tuesdayLayer)) tuesdayLayer.addTo(map);
+      focusTuesday();
+    }
+
+    function focusTuesday() {
+      dayLayers.forEach((obj, idx) => {
+        const keep = idx <= 16;
+        if (keep) obj.group.addTo(map); else if (map.hasLayer(obj.group)) map.removeLayer(obj.group);
+      });
+      if (tuesdayLayer && !map.hasLayer(tuesdayLayer)) tuesdayLayer.addTo(map);
+      const bounds = L.latLngBounds([]);
+      tuesdayShortcut.points.forEach(p => bounds.extend([p.lat, p.lon]));
+      map.fitBounds(bounds.pad(0.35));
+    }
+
+    function fitAll() {
+      map.invalidateSize();
+      if (allBounds.isValid()) map.fitBounds(allBounds.pad(0.1));
+    }
+
+    async function init() {
+      renderList();
+      for (let i = 0; i < days.length; i++) {
+        await buildDay(days[i], i);
+      }
+      fitAll();
+      setTimeout(() => {
+        map.invalidateSize();
+        fitAll();
+      }, 250);
+    }
+
+    init();
+    window.addEventListener('resize', () => {
+      map.invalidateSize();
+      fitAll();
+    });
+  </script>
+</body>
+</html>
