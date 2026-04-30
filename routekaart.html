@@ -21,6 +21,7 @@
     button.primary { background:#173ea5; color:#fff; border-color:#173ea5; }
     .day { border:1px solid #e4e9f2; border-radius:16px; margin-bottom:10px; background:#fbfcfe; overflow:hidden; }
     .day:hover { border-color:#bfd0f5; background:#f7faff; }
+    .day.is-active { border-color:#173ea5; box-shadow:0 0 0 2px rgba(23,62,165,.12); background:#f7faff; }
     .day-main { width:100%; border:0; background:transparent; border-radius:0; padding:12px; color:inherit; cursor:pointer; text-align:left; }
     .day-main:hover { background:#f7faff; }
     .day h3 { margin:0 0 4px; font-size:16px; }
@@ -1835,6 +1836,8 @@
     const dayLayers = [];
     const allBounds = L.latLngBounds([]);
     let tuesdayLayer = null;
+    let activeDayIndex = null;
+    let pendingFocusIndex = null;
 
     function pointsToCoords(points) {
       return points.map(p => [p.lon, p.lat]).join(';');
@@ -1936,12 +1939,17 @@
       });
     }
 
-    function focusDay(idx) {
-      dayLayers.forEach((obj, i) => {
-        if (map.hasLayer(obj.group)) map.removeLayer(obj.group);
-        if (i === idx) obj.group.addTo(map);
+    function isMobileLayout() {
+      return window.matchMedia('(max-width: 980px)').matches;
+    }
+
+    function markActiveDay(idx) {
+      document.querySelectorAll('.day').forEach((card, cardIdx) => {
+        card.classList.toggle('is-active', cardIdx === idx);
       });
-      if (tuesdayLayer && map.hasLayer(tuesdayLayer)) map.removeLayer(tuesdayLayer);
+    }
+
+    function fitDayBounds(idx) {
       const bounds = L.latLngBounds([]);
       const points = dayLayers[idx].day.points;
       points.forEach(p => bounds.extend([p.lat, p.lon]));
@@ -1949,7 +1957,41 @@
       map.fitBounds(bounds.pad(0.25));
     }
 
+    function revealMapOnMobile(idx) {
+      if (!isMobileLayout()) return;
+
+      document.querySelector('.mapwrap').scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+
+      setTimeout(() => {
+        map.invalidateSize();
+        fitDayBounds(idx);
+      }, 350);
+    }
+
+    function focusDay(idx) {
+      activeDayIndex = idx;
+      markActiveDay(idx);
+
+      if (!dayLayers[idx]) {
+        pendingFocusIndex = idx;
+        return;
+      }
+
+      dayLayers.forEach((obj, i) => {
+        if (map.hasLayer(obj.group)) map.removeLayer(obj.group);
+        if (i === idx) obj.group.addTo(map);
+      });
+      if (tuesdayLayer && map.hasLayer(tuesdayLayer)) map.removeLayer(tuesdayLayer);
+      fitDayBounds(idx);
+      revealMapOnMobile(idx);
+    }
+
     function showAll() {
+      activeDayIndex = null;
+      markActiveDay(null);
       dayLayers.forEach(obj => obj.group.addTo(map));
       fitAll();
     }
@@ -1984,6 +2026,12 @@
       for (let i = 0; i < days.length; i++) {
         await buildDay(days[i], i);
       }
+      if (pendingFocusIndex !== null) {
+        const idx = pendingFocusIndex;
+        pendingFocusIndex = null;
+        focusDay(idx);
+        return;
+      }
       fitAll();
       setTimeout(() => {
         map.invalidateSize();
@@ -1994,7 +2042,11 @@
     init();
     window.addEventListener('resize', () => {
       map.invalidateSize();
-      fitAll();
+      if (activeDayIndex !== null) {
+        fitDayBounds(activeDayIndex);
+      } else {
+        fitAll();
+      }
     });
   </script>
 </body>
