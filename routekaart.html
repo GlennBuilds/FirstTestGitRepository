@@ -45,17 +45,30 @@
     .maplink { display:inline-flex; margin-top:10px; color:#173ea5; font-weight:800; font-size:12px; }
     .optional { border-style:dashed; background:#fffaf8; }
     .swatch { display:inline-block; width:10px; height:10px; border-radius:999px; margin-right:7px; vertical-align:middle; }
+    .overview-panel { display:grid; gap:12px; margin-bottom:16px; }
+    .overview-card { border:1px solid #e4e9f2; border-radius:16px; background:#fbfcfe; padding:12px; }
+    .overview-card h2 { margin:0 0 9px; font-size:16px; }
+    .stat-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px; }
+    .stat { background:#eef4ff; border-radius:12px; padding:10px; }
+    .stat strong { display:block; color:#173ea5; font-size:18px; line-height:1.1; }
+    .stat span { color:#5b667a; font-size:12px; }
+    .stay-list { display:grid; gap:7px; }
+    .stay { display:flex; justify-content:space-between; gap:10px; border-top:1px solid #e4e9f2; padding-top:7px; font-size:13px; line-height:1.35; }
+    .stay:first-child { border-top:0; padding-top:0; }
+    .stay span { color:#5b667a; text-align:right; white-space:nowrap; }
+    .mobile-nav { display:none; }
     .zoomhint { position:absolute; right:14px; top:14px; z-index:500; background:rgba(255,255,255,.96); border:1px solid #dce3ef; border-radius:12px; padding:10px 12px; font-size:12px; color:#475569; max-width:280px; box-shadow:0 8px 24px rgba(15,23,42,.08); }
     @media (max-width: 980px) {
       html, body { height:auto; min-height:100%; overflow-x:hidden; }
+      body { padding-bottom:76px; }
       .layout { display:flex; flex-direction:column; min-height:100vh; height:auto; }
-      .mapwrap { order:1; position:sticky; top:0; z-index:20; height:52vh; min-height:360px; border-bottom:1px solid #dce3ef; background:#dbeafe; }
+      .mapwrap { order:1; height:calc(100vh - 76px); min-height:520px; border-bottom:1px solid #dce3ef; background:#dbeafe; }
       #map { height:100%; min-height:360px; }
       .side { order:2; overflow:visible; border-right:none; padding:12px 12px 24px; }
       h1 { font-size:22px; }
       .sub { margin-bottom:10px; }
       .note { padding:10px 12px; margin-bottom:10px; }
-      .buttons { position:sticky; top:52vh; z-index:18; background:rgba(255,255,255,.96); padding:8px 0 10px; margin:0 0 10px; }
+      .buttons { background:rgba(255,255,255,.96); padding:0 0 10px; margin:0 0 10px; }
       .buttons button { flex:1 1 140px; border-radius:12px; }
       .day { margin-bottom:8px; border-radius:14px; }
       .day-main { padding:10px; }
@@ -67,22 +80,64 @@
       .facts { grid-template-columns:1fr; }
       .advice { padding:9px; }
       .zoomhint { left:10px; right:10px; top:10px; max-width:none; padding:8px 10px; font-size:11px; }
+      .mobile-nav { position:fixed; left:0; right:0; bottom:0; z-index:1000; display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; padding:8px 10px calc(8px + env(safe-area-inset-bottom)); background:rgba(255,255,255,.96); border-top:1px solid #dce3ef; box-shadow:0 -12px 32px rgba(15,23,42,.10); }
+      .mobile-nav button { border-radius:14px; padding:9px 8px; font-size:12px; }
+      .mobile-nav button[aria-current="true"] { background:#173ea5; color:#fff; border-color:#173ea5; }
+      body[data-view="overview"] .mapwrap,
+      body[data-view="overview"] .buttons,
+      body[data-view="overview"] #daylist { display:none; }
+      body[data-view="overview"] .overview-panel { display:grid; }
+      body[data-view="map"] .side { display:none; }
+      body[data-view="map"] .mapwrap { display:block; }
+      body[data-view="days"] .mapwrap,
+      body[data-view="days"] .overview-panel { display:none; }
+      body[data-view="days"] #daylist { display:block; }
+      body[data-view="days"] .buttons { display:flex; }
     }
     @media (max-width: 520px) {
-      .mapwrap { height:46vh; min-height:310px; }
+      .mapwrap { height:calc(100vh - 76px); min-height:480px; }
       #map { min-height:310px; }
-      .buttons { top:46vh; }
       .sub { display:none; }
       .note { font-size:12px; }
+      .stat-grid { grid-template-columns:1fr; }
     }
   </style>
 </head>
-<body>
+<body data-view="overview">
   <div class="layout">
     <aside class="side">
       <h1>Balkan roadtrip 2026</h1>
       <div class="sub">Alles in één overzicht, met alle tussenstops op de kaart én de adviezen, tips en opties uit de definitieve detailplanning.</div>
       <div class="note"><strong>Definitieve route:</strong> za 13 juni t/m do 2 juli 2026, zonder flexdagen. Klik een dag aan om de route te focussen; klap de details open voor alle tips.</div>
+      <section class="overview-panel" id="overview-panel">
+        <div class="overview-card">
+          <h2>Reis in één oogopslag</h2>
+          <div class="stat-grid">
+            <div class="stat"><strong>20</strong><span>dagen</span></div>
+            <div class="stat"><strong>19</strong><span>nachten</span></div>
+            <div class="stat"><strong>9</strong><span>slaapplekken</span></div>
+            <div class="stat"><strong>3</strong><span>landen/regio's</span></div>
+          </div>
+        </div>
+        <div class="overview-card">
+          <h2>Routeflow</h2>
+          <div class="mini">Podgorica → Skadar → Perast → Žabljak → Tjentište → Sarajevo → Mostar → Trebinje → Podgorica</div>
+        </div>
+        <div class="overview-card">
+          <h2>Overnachtingsvolgorde</h2>
+          <div class="stay-list">
+            <div class="stay"><strong>Podgorica</strong><span>1 nacht</span></div>
+            <div class="stay"><strong>Virpazar / Lake Skadar</strong><span>2 nachten</span></div>
+            <div class="stay"><strong>Perast / Kotor Bay</strong><span>4 nachten</span></div>
+            <div class="stay"><strong>Žabljak / Durmitor</strong><span>4 nachten</span></div>
+            <div class="stay"><strong>Tjentište / Sutjeska</strong><span>1 nacht</span></div>
+            <div class="stay"><strong>Sarajevo</strong><span>2 nachten</span></div>
+            <div class="stay"><strong>Mostar / Herzegovina</strong><span>3 nachten</span></div>
+            <div class="stay"><strong>Trebinje</strong><span>1 nacht</span></div>
+            <div class="stay"><strong>Podgorica</strong><span>1 nacht</span></div>
+          </div>
+        </div>
+      </section>
       <div class="buttons">
         <button class="primary" onclick="showAll()">Toon hele route</button>
         <button onclick="fitAll()">Zoom volledig</button>
@@ -94,6 +149,11 @@
       <div id="map"></div>
     </main>
   </div>
+  <nav class="mobile-nav" aria-label="Mobiele navigatie">
+    <button type="button" data-view-target="overview" aria-current="true">Overzicht</button>
+    <button type="button" data-view-target="map">Kaart</button>
+    <button type="button" data-view-target="days">Dagplan</button>
+  </nav>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script>
@@ -1939,6 +1999,26 @@
       });
     }
 
+    function setView(view) {
+      document.body.dataset.view = view;
+      document.querySelectorAll('[data-view-target]').forEach((button) => {
+        button.setAttribute('aria-current', String(button.dataset.viewTarget === view));
+      });
+
+      if (view === 'map') {
+        setTimeout(() => {
+          map.invalidateSize();
+          if (activeDayIndex !== null && dayLayers[activeDayIndex]) {
+            fitDayBounds(activeDayIndex);
+          } else {
+            fitAll();
+          }
+        }, 80);
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function isMobileLayout() {
       return window.matchMedia('(max-width: 980px)').matches;
     }
@@ -1960,10 +2040,7 @@
     function revealMapOnMobile(idx) {
       if (!isMobileLayout()) return;
 
-      document.querySelector('.mapwrap').scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
+      setView('map');
 
       setTimeout(() => {
         map.invalidateSize();
@@ -1993,6 +2070,7 @@
       activeDayIndex = null;
       markActiveDay(null);
       dayLayers.forEach(obj => obj.group.addTo(map));
+      if (isMobileLayout()) setView('map');
       fitAll();
     }
 
@@ -2023,6 +2101,11 @@
 
     async function init() {
       renderList();
+      document.querySelectorAll('[data-view-target]').forEach((button) => {
+        button.addEventListener('click', () => setView(button.dataset.viewTarget));
+      });
+      setView(isMobileLayout() ? 'overview' : 'map');
+
       for (let i = 0; i < days.length; i++) {
         await buildDay(days[i], i);
       }
@@ -2042,6 +2125,9 @@
     init();
     window.addEventListener('resize', () => {
       map.invalidateSize();
+      if (!isMobileLayout()) {
+        document.body.dataset.view = 'map';
+      }
       if (activeDayIndex !== null) {
         fitDayBounds(activeDayIndex);
       } else {
