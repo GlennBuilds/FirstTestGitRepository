@@ -3,8 +3,9 @@
 This repository contains the Balkan roadtrip planning pages for June/July 2026.
 
 ## Files
-- `index.html` – detailed day-by-day planning page
-- `routekaart.html` – interactive route map with compact mobile layout and expandable daily advice
+- `index.html` – redirect to the main roadtrip dashboard
+- `routekaart.html` – main roadtrip dashboard with mobile views for overview, map, and day planning
+- `detailplanning.html` – archived detailed day-by-day planning page
 - `balkan_route_definitief_donderdag_2026.html` – redirect kept for old links
 - `styles.css` – styling for the detailed planning page
 - `app.js` – small interactions for the detailed planning page
