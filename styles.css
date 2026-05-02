@@ -2,6 +2,7 @@
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#f5f8fe 0%,#f7f9fc 100%);color:var(--ink)}
 a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
 .wrap{max-width:1520px;margin:0 auto;padding:26px 20px 44px}
+.page-switch{display:flex;gap:10px;margin:0 0 16px}.page-switch a{flex:1;text-align:center;border:1px solid var(--line);border-radius:14px;padding:11px 14px;background:#fff;color:var(--ink);font-weight:900;text-decoration:none;box-shadow:var(--shadow)}.page-switch a:hover{background:#f8fbff;text-decoration:none}.page-switch a[aria-current="page"]{background:var(--blue);border-color:var(--blue);color:#fff}
 .hero{background:linear-gradient(135deg,#1d36af 0%,#3662f1 100%);color:#fff;border-radius:30px;padding:34px;box-shadow:var(--shadow)}
 .hero h1{margin:0 0 10px;font-size:clamp(30px,4.2vw,48px);line-height:1.05}.hero p{margin:0;max-width:1100px;line-height:1.65;color:rgba(255,255,255,.93)}
 .badges{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap}.badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.24);padding:9px 12px;border-radius:999px;font-weight:800;font-size:14px}.hero-actions{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap}.hero-btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 16px;border-radius:14px;font-weight:800;font-size:15px;background:#ffffff;color:#173ea5;border:1px solid rgba(255,255,255,.35);box-shadow:0 8px 20px rgba(9,20,52,.14)}.hero-btn:hover{text-decoration:none;filter:brightness(.98)}.hero-btn.secondary{background:rgba(255,255,255,.14);color:#ffffff;border:1px solid rgba(255,255,255,.24)}
@@ -24,6 +25,7 @@ a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
 /* Mobile-safe color overrides */
 body{-webkit-text-size-adjust:100%}
 .hero,.hero *,.badge{color:#ffffff !important;-webkit-text-fill-color:#ffffff !important}
+.page-switch a{color:var(--ink) !important;-webkit-text-fill-color:currentColor !important}.page-switch a[aria-current="page"]{color:#fff !important;-webkit-text-fill-color:#fff !important}
 .panel h2,.side h2,.trip-table td,.trip-table strong,.day-link,.day-link strong,.quick p,.principle,.principle strong,.block h4,.block p,.block li,.meta p,.card-head,.card-title h3,.dayno{color:var(--ink) !important;-webkit-text-fill-color:currentColor}
 .quick h3,.small,.meta h4,.card-title p,.day-link small{color:var(--muted) !important;-webkit-text-fill-color:currentColor}
 .card-head,.card-head *{color:var(--ink) !important}
