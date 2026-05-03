@@ -1,4 +1,5 @@
-const CACHE_NAME = 'balkan2026-v1';
+const CACHE_NAME = 'balkan2026-v2';
+const MAP_CACHE_NAME = 'balkan2026-map-v1';
 const BASE_PATH = new URL('./', self.location.href).pathname;
 
 const APP_SHELL = [
@@ -32,6 +33,26 @@ function localUrl(path) {
   return new URL(`${BASE_PATH}${path}`, self.location.origin).toString();
 }
 
+function isMapTileRequest(url) {
+  return url.hostname.endsWith('tile.openstreetmap.org');
+}
+
+function isRouteGeometryRequest(url) {
+  return url.hostname === 'router.project-osrm.org';
+}
+
+function cacheFirst(request, cacheName) {
+  return caches.match(request).then((cached) => {
+    if (cached) return cached;
+
+    return fetch(request).then((response) => {
+      const copy = response.clone();
+      caches.open(cacheName).then((cache) => cache.put(request, copy));
+      return response;
+    });
+  });
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -45,7 +66,7 @@ self.addEventListener('activate', (event) => {
     caches.keys()
       .then((names) => Promise.all(
         names
-          .filter((name) => name.startsWith('balkan2026-') && name !== CACHE_NAME)
+          .filter((name) => name.startsWith('balkan2026-') && ![CACHE_NAME, MAP_CACHE_NAME].includes(name))
           .map((name) => caches.delete(name))
       ))
       .then(() => self.clients.claim())
@@ -58,6 +79,11 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
   const isLocalAppRequest = url.origin === self.location.origin && url.pathname.startsWith(BASE_PATH);
+
+  if (isMapTileRequest(url) || isRouteGeometryRequest(url)) {
+    event.respondWith(cacheFirst(request, MAP_CACHE_NAME));
+    return;
+  }
 
   if (request.mode === 'navigate') {
     event.respondWith(

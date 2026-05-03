@@ -44,4 +44,4 @@ The PWA manifest uses `/Balkan2026/` as both start URL and scope, so the install
 4. Turn on airplane mode.
 5. Open the app again and check that the route and travel information remain visible.
 
-The core trip content and route data are local files and are cached by the service worker. External map tiles and live road geometry depend on network access, so the map background may be limited offline, but the planned route information remains available.
+The core trip content and route data are local files and are cached by the service worker. The app also caches OpenStreetMap tiles and OSRM route geometry at runtime after they have been viewed online. Offline map detail is therefore available for areas you opened before; areas that were never loaded may show a simple fallback background while the routes, stops, and travel information remain visible.

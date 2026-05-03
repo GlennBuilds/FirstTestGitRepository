@@ -12,7 +12,10 @@ baseTiles.on('tileerror', () => {
   if (tileErrorReported) return;
   tileErrorReported = true;
   document.body.classList.add('map-tiles-failed');
-  setMapStatus("Kaarttegels laden niet, maar de routes blijven zichtbaar als fallback.");
+  setMapStatus(navigator.onLine
+    ? "Kaarttegels laden niet, maar de routes blijven zichtbaar als fallback."
+    : "Je bent offline. Eerder bekeken kaarttegels kunnen zichtbaar blijven; de routes en reisinfo blijven lokaal beschikbaar."
+  );
 });
 
 const dayLayers = [];
@@ -521,6 +524,15 @@ function setMapStatus(message) {
     : message;
 }
 
+function updateConnectivityStatus() {
+  document.body.classList.toggle('is-offline', !navigator.onLine);
+  if (!navigator.onLine) {
+    setMapStatus("Je bent offline. Reisinfo en routes blijven beschikbaar; niet eerder bekeken kaarttegels kunnen ontbreken.");
+  } else if (tileErrorReported) {
+    setMapStatus("Je bent weer online. Kaarttegels worden opnieuw geladen zodra je de kaart beweegt of zoomt.");
+  }
+}
+
 function updateMapFilterState(routeId) {
   const title = document.getElementById('current-route-title');
   const meta = document.getElementById('current-route-meta');
@@ -559,6 +571,7 @@ function fitAll() {
 }
 
 async function init() {
+  updateConnectivityStatus();
   setupViewNavigation();
   setupBlockControls();
   setupStickyBlockBars();
@@ -597,3 +610,5 @@ window.addEventListener('resize', () => {
     fitAll();
   }
 });
+window.addEventListener('online', updateConnectivityStatus);
+window.addEventListener('offline', updateConnectivityStatus);
