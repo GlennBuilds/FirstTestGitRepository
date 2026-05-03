@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Balkan2026">
-  <rect width="512" height="512" rx="112" fill="#173ea5"/>
-  <path d="M116 344c38-70 82-104 132-102 32 1 54 16 83 16 28 0 51-14 65-38" fill="none" stroke="#ffffff" stroke-width="34" stroke-linecap="round"/>
-  <path d="M116 344c38-70 82-104 132-102 32 1 54 16 83 16 28 0 51-14 65-38" fill="none" stroke="#f97316" stroke-width="14" stroke-linecap="round"/>
-  <circle cx="116" cy="344" r="26" fill="#ffffff"/>
-  <circle cx="116" cy="344" r="12" fill="#f97316"/>
-  <circle cx="396" cy="220" r="26" fill="#ffffff"/>
-  <circle cx="396" cy="220" r="12" fill="#f97316"/>
-  <text x="256" y="168" text-anchor="middle" font-family="Arial, sans-serif" font-size="72" font-weight="800" fill="#ffffff">B26</text>
+  <rect width="512" height="512" rx="112" fill="#f5f5f7"/>
+  <circle cx="256" cy="256" r="174" fill="#ffffff" stroke="#d2d2d7" stroke-width="10"/>
+  <path d="M140 322c45-76 90-112 136-108 30 3 48 24 78 19 27-5 48-28 62-56" fill="none" stroke="#007aff" stroke-width="34" stroke-linecap="round"/>
+  <path d="M140 322c45-76 90-112 136-108 30 3 48 24 78 19 27-5 48-28 62-56" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" opacity=".9"/>
+  <path d="M284 112l-50 154 154-50-74-30-30-74z" fill="#ff9500"/>
+  <path d="M284 112l-50 154 80-80-30-74z" fill="#ffbd45"/>
+  <circle cx="140" cy="322" r="28" fill="#ffffff" stroke="#007aff" stroke-width="10"/>
+  <circle cx="416" cy="177" r="28" fill="#ffffff" stroke="#ff9500" stroke-width="10"/>
 </svg>
