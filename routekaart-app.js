@@ -19,6 +19,8 @@ const dayLayers = [];
 const allBounds = L.latLngBounds([]);
 let activeDayIndex = null;
 let routeGeometryLoading = true;
+let userLocationLayer = null;
+let userLocationWatchId = null;
 
 function pointsToCoords(points) {
   return points.map(p => [p.lon, p.lat]).join(';');
@@ -240,6 +242,97 @@ function setupMapRouteFilter() {
   });
 }
 
+function setupUserLocationControl() {
+  const control = L.control({ position: 'topleft' });
+
+  control.onAdd = () => {
+    const container = L.DomUtil.create('div', 'leaflet-bar locate-control');
+    const button = L.DomUtil.create('button', '', container);
+    button.type = 'button';
+    button.title = 'Toon mijn locatie op de kaart';
+    button.setAttribute('aria-label', 'Toon mijn locatie op de kaart');
+    button.textContent = '◎';
+
+    L.DomEvent.disableClickPropagation(container);
+    L.DomEvent.on(button, 'click', (event) => {
+      L.DomEvent.preventDefault(event);
+      enableUserLocation(button);
+    });
+
+    if (!navigator.geolocation) {
+      button.disabled = true;
+      button.title = 'Locatie is niet beschikbaar in deze browser';
+      return container;
+    }
+
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions.query({ name: 'geolocation' }).then((permission) => {
+        if (permission.state === 'granted') enableUserLocation(button, false);
+      }).catch(() => { });
+    }
+
+    return container;
+  };
+
+  control.addTo(map);
+}
+
+function enableUserLocation(button, showError = true) {
+  if (!navigator.geolocation) return;
+  if (button) button.classList.add('is-locating');
+
+  if (userLocationWatchId !== null) {
+    navigator.geolocation.clearWatch(userLocationWatchId);
+  }
+
+  userLocationWatchId = navigator.geolocation.watchPosition(
+    (position) => {
+      if (button) {
+        button.classList.remove('is-locating');
+        button.classList.add('is-active');
+        button.title = 'Je locatie staat op de kaart';
+      }
+      updateUserLocation(position);
+    },
+    () => {
+      if (button) button.classList.remove('is-locating');
+      if (showError) setMapStatus('Locatie kon niet worden getoond. Controleer de locatietoestemming van je browser.');
+    },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 30000,
+      timeout: 10000
+    }
+  );
+}
+
+function updateUserLocation(position) {
+  const { latitude, longitude, accuracy } = position.coords;
+
+  if (!userLocationLayer) {
+    userLocationLayer = L.layerGroup().addTo(map);
+  }
+
+  userLocationLayer.clearLayers();
+
+  L.circle([latitude, longitude], {
+    radius: accuracy || 50,
+    color: '#2563eb',
+    weight: 1,
+    fillColor: '#60a5fa',
+    fillOpacity: 0.12,
+    interactive: false
+  }).addTo(userLocationLayer);
+
+  L.circleMarker([latitude, longitude], {
+    radius: 7,
+    color: '#ffffff',
+    weight: 2,
+    fillColor: '#2563eb',
+    fillOpacity: 1
+  }).bindPopup(`<strong>Je huidige locatie</strong><br>Nauwkeurigheid ongeveer ${Math.round(accuracy || 0)} meter.`).addTo(userLocationLayer);
+}
+
 function parseRouteDate(dateLabel) {
   const match = dateLabel.match(/^(\S+)\s+(\d{1,2})\s+juni\s+2026$/i);
   if (!match) return null;
@@ -447,6 +540,7 @@ async function init() {
   setupRouteViewerButtons();
   setupStayNavigation();
   setupMapRouteFilter();
+  setupUserLocationControl();
   setView(isMobileLayout() ? 'overview' : 'map');
 
   days.forEach((day, index) => buildDay(day, index));
