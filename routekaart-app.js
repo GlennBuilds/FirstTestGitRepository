@@ -171,43 +171,92 @@ function setupRouteViewerButtons() {
 }
 
 function setupMapRouteFilter() {
-  const select = document.getElementById('route-filter');
-  const apply = document.getElementById('apply-route-filter');
   const reset = document.getElementById('reset-route-filter');
-  if (!select || !apply || !reset) return;
+  const close = document.getElementById('close-route-filter');
+  const dateGrid = document.getElementById('route-date-grid');
+  const routeList = document.getElementById('route-day-routes');
+  const selectedDate = document.getElementById('selected-route-date');
+  const control = document.getElementById('map-control');
+  if (!dateGrid || !routeList || !reset) return;
 
-  const renderedRoutes = new Set();
-  routeFilterGroups.forEach((group) => {
-    const optgroup = document.createElement('optgroup');
-    optgroup.label = group.label;
-    group.ids.forEach((routeId) => {
-      const route = days.find(day => day.id === routeId);
-      if (!route || renderedRoutes.has(routeId)) return;
-      renderedRoutes.add(routeId);
-      const option = document.createElement('option');
-      option.value = route.id;
-      option.textContent = `${route.date} · ${route.title}`;
-      optgroup.appendChild(option);
-    });
-    select.appendChild(optgroup);
-  });
-
-  apply.addEventListener('click', () => {
-    if (select.value === 'all') {
-      showAll();
-    } else {
-      focusRouteById(select.value);
+  const routesByDay = days.reduce((groups, route) => {
+    const calendarDate = parseRouteDate(route.date);
+    if (!calendarDate) return groups;
+    const key = String(calendarDate.day);
+    if (!groups.has(key)) {
+      groups.set(key, { ...calendarDate, routes: [] });
     }
+    groups.get(key).routes.push(route);
+    return groups;
+  }, new Map());
+
+  function renderRoutesForDay(group) {
+    routeList.replaceChildren();
+    dateGrid.querySelectorAll('[data-route-day]').forEach((button) => {
+      button.classList.toggle('is-selected', button.dataset.routeDay === String(group.day));
+      button.setAttribute('aria-pressed', String(button.dataset.routeDay === String(group.day)));
+    });
+    if (selectedDate) selectedDate.textContent = `${group.weekdayLong} ${group.day} juni`;
+
+    group.routes.forEach((route) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'route-filter-button';
+      button.dataset.routeFilter = route.id;
+      button.textContent = route.title;
+      button.addEventListener('click', () => {
+        focusRouteById(route.id);
+        if (control) control.open = false;
+      });
+      routeList.appendChild(button);
+    });
+  }
+
+  Array.from(routesByDay.values()).sort((a, b) => a.day - b.day).forEach((group) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'route-date-button';
+    button.dataset.routeDay = String(group.day);
+    button.setAttribute('aria-label', `${group.weekdayLong} ${group.day} juni, ${group.routes.length} route${group.routes.length === 1 ? '' : 's'}`);
+    button.innerHTML = `
+      <span class="route-date-weekday">${group.weekday}</span>
+      <span class="route-date-number">${group.day}</span>
+      <span class="route-date-count">${group.routes.length} route${group.routes.length === 1 ? '' : 's'}</span>
+    `;
+    button.addEventListener('click', () => renderRoutesForDay(group));
+    dateGrid.appendChild(button);
   });
 
-  select.addEventListener('change', () => {
-    if (select.value !== 'all') focusRouteById(select.value);
-  });
+  const firstGroup = routesByDay.values().next().value;
+  if (firstGroup) renderRoutesForDay(firstGroup);
 
   reset.addEventListener('click', () => {
-    select.value = 'all';
     showAll();
+    if (control) control.open = false;
   });
+
+  if (close && control) close.addEventListener('click', () => {
+    control.open = false;
+  });
+}
+
+function parseRouteDate(dateLabel) {
+  const match = dateLabel.match(/^(\S+)\s+(\d{1,2})\s+juni\s+2026$/i);
+  if (!match) return null;
+  const weekdayMap = {
+    Ma: "Maandag",
+    Di: "Dinsdag",
+    Wo: "Woensdag",
+    Do: "Donderdag",
+    Vr: "Vrijdag",
+    Za: "Zaterdag",
+    Zo: "Zondag"
+  };
+  return {
+    weekday: match[1],
+    weekdayLong: weekdayMap[match[1]] || match[1],
+    day: Number(match[2])
+  };
 }
 
 function setupStayNavigation() {
@@ -273,8 +322,9 @@ function isMobileLayout() {
 
 function markActiveDay(idx) {
   const activeRouteId = idx !== null && dayLayers[idx] ? dayLayers[idx].day.id : null;
-  document.querySelectorAll('[data-route-view]').forEach((button) => {
-    const active = button.dataset.routeView === activeRouteId;
+  document.querySelectorAll('[data-route-view], [data-route-filter]').forEach((button) => {
+    const routeId = button.dataset.routeView || button.dataset.routeFilter;
+    const active = routeId === activeRouteId;
     button.classList.toggle('is-active-route', active);
     button.setAttribute('aria-pressed', String(active));
   });
@@ -354,15 +404,33 @@ function setMapStatus(message) {
 }
 
 function updateMapFilterState(routeId) {
-  const select = document.getElementById('route-filter');
-  if (select && select.value !== routeId) select.value = routeId;
+  const title = document.getElementById('current-route-title');
+  const meta = document.getElementById('current-route-meta');
+  const mapsLink = document.getElementById('current-route-maps');
 
   if (routeId === 'all') {
+    if (title) title.textContent = "Huidige totaalroute";
+    if (meta) meta.textContent = "Alle hoofdtrajecten zichtbaar.";
+    if (mapsLink) {
+      mapsLink.hidden = true;
+      mapsLink.removeAttribute('href');
+    }
     setMapStatus(routeGeometryLoading ? "Huidige totaalroute zichtbaar. Weglijnen laden op de achtergrond." : "Huidige totaalroute zichtbaar.");
     return;
   }
 
   const route = days.find(day => day.id === routeId);
+  if (title) title.textContent = route ? route.title : "Route";
+  if (meta) meta.textContent = route ? `${route.date} · Dag ${route.dayNumber}` : "";
+  if (mapsLink) {
+    if (route && route.routeLink) {
+      mapsLink.href = route.routeLink;
+      mapsLink.hidden = false;
+    } else {
+      mapsLink.hidden = true;
+      mapsLink.removeAttribute('href');
+    }
+  }
   setMapStatus(route ? `${route.date} · ${route.title} zichtbaar.` : "");
 }
 

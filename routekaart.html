@@ -1760,20 +1760,29 @@
       </section>
     </aside>
     <main class="mapwrap">
-      <details class="map-control">
-        <summary>Routefilter</summary>
+      <details class="map-control" id="map-control">
+        <summary><span class="filter-label">Routefilter</span><span class="filter-icon" aria-hidden="true">☰</span></summary>
         <div class="map-control-body">
-          <label for="route-filter">Toon route</label>
-          <select id="route-filter">
-            <option value="all">Huidige totaalroute</option>
-          </select>
-          <div class="map-control-actions">
-            <button class="primary" type="button" id="apply-route-filter">Toon route</button>
-            <button type="button" id="reset-route-filter">Reset</button>
+          <button class="primary" type="button" id="reset-route-filter">Toon totaalroute</button>
+          <div class="route-calendar-head">
+            <span>Selecteer reisdatum</span>
+            <strong id="selected-route-date">Juni 2026</strong>
           </div>
-          <div class="map-status" id="map-status" aria-live="polite">Huidige totaalroute zichtbaar.</div>
+          <div class="route-month-label">Juni 2026 · alleen dagen met routes</div>
+          <div class="route-date-grid" id="route-date-grid" aria-label="Kies een reisdag in juni"></div>
+          <div class="route-day-routes" id="route-day-routes" aria-live="polite"></div>
+          <div class="map-control-actions">
+            <button type="button" id="close-route-filter">Filter inklappen</button>
+          </div>
         </div>
       </details>
+      <div class="current-route-card" id="current-route-card" aria-live="polite">
+        <div>
+          <strong id="current-route-title">Huidige totaalroute</strong>
+          <span id="current-route-meta">Alle hoofdtrajecten zichtbaar.</span>
+        </div>
+        <a id="current-route-maps" href="#" target="_blank" rel="noopener" hidden>Open in Google Maps</a>
+      </div>
       <div class="zoomhint">Klik links op een dag om alleen dat traject uit te lichten.</div>
       <div id="map"></div>
     </main>
