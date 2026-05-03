@@ -256,6 +256,10 @@ function setupUserLocationControl() {
     L.DomEvent.disableClickPropagation(container);
     L.DomEvent.on(button, 'click', (event) => {
       L.DomEvent.preventDefault(event);
+      if (userLocationWatchId !== null) {
+        disableUserLocation(button);
+        return;
+      }
       enableUserLocation(button);
     });
 
@@ -277,6 +281,25 @@ function setupUserLocationControl() {
   control.addTo(map);
 }
 
+function disableUserLocation(button) {
+  if (userLocationWatchId !== null && navigator.geolocation) {
+    navigator.geolocation.clearWatch(userLocationWatchId);
+    userLocationWatchId = null;
+  }
+
+  if (userLocationLayer) {
+    userLocationLayer.clearLayers();
+    map.removeLayer(userLocationLayer);
+    userLocationLayer = null;
+  }
+
+  if (button) {
+    button.classList.remove('is-active', 'is-locating');
+    button.title = 'Toon mijn locatie op de kaart';
+    button.setAttribute('aria-label', 'Toon mijn locatie op de kaart');
+  }
+}
+
 function enableUserLocation(button, showError = true) {
   if (!navigator.geolocation) return;
   if (button) button.classList.add('is-locating');
@@ -291,11 +314,13 @@ function enableUserLocation(button, showError = true) {
         button.classList.remove('is-locating');
         button.classList.add('is-active');
         button.title = 'Je locatie staat op de kaart';
+        button.setAttribute('aria-label', 'Verberg mijn locatie op de kaart');
       }
       updateUserLocation(position);
     },
     () => {
       if (button) button.classList.remove('is-locating');
+      userLocationWatchId = null;
       if (showError) setMapStatus('Locatie kon niet worden getoond. Controleer de locatietoestemming van je browser.');
     },
     {
