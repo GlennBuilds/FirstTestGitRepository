@@ -570,11 +570,42 @@ function fitAll() {
   if (bounds.isValid()) map.fitBounds(bounds.pad(0.1));
 }
 
+function setupBlockRouteAccordions() {
+  document.querySelectorAll('.block-section > h3').forEach((heading) => {
+    if (!heading.textContent.includes('Google Maps-link')) return;
+
+    const actions = heading.nextElementSibling;
+    if (!actions?.classList.contains('route-actions')) return;
+
+    const actionCount = actions.children.length;
+    const routeCount = Math.max(1, Math.ceil(actionCount / 2));
+    const panel = document.createElement('details');
+    panel.className = 'route-link-panel';
+
+    const summary = document.createElement('summary');
+    summary.innerHTML = `
+      <span>
+        <strong>Routes en kaarten</strong>
+        <small>${routeCount} route${routeCount === 1 ? '' : 's'} beschikbaar</small>
+      </span>
+      <span class="route-link-chevron" aria-hidden="true">⌄</span>
+    `;
+
+    const body = document.createElement('div');
+    body.className = 'route-link-panel-body';
+    body.appendChild(actions);
+
+    panel.append(summary, body);
+    heading.replaceWith(panel);
+  });
+}
+
 async function init() {
   updateConnectivityStatus();
   setupViewNavigation();
   setupBlockControls();
   setupStickyBlockBars();
+  setupBlockRouteAccordions();
   setupRouteViewerButtons();
   setupStayNavigation();
   setupMapRouteFilter();

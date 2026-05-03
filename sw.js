@@ -1,4 +1,4 @@
-const CACHE_NAME = 'balkan2026-v4';
+const CACHE_NAME = 'balkan2026-v11';
 const MAP_CACHE_NAME = 'balkan2026-map-v1';
 const BASE_PATH = new URL('./', self.location.href).pathname;
 
@@ -24,6 +24,7 @@ const APP_SHELL = [
   'assets/vendor/leaflet/images/marker-icon-2x.png',
   'assets/vendor/leaflet/images/marker-shadow.png',
   'assets/icons/balkan2026-icon.svg',
+  'assets/icons/balkan2026-logo-source.png',
   'assets/icons/favicon-16.png',
   'assets/icons/favicon-32.png',
   'assets/icons/icon-192.png',
