@@ -4,175 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Balkan routekaart 2026</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <style>
-    html, body { height:100%; margin:0; font-family: Arial, sans-serif; color:#172033; background:#f4f6fa; }
-    .layout { display:grid; grid-template-columns: minmax(420px, 37vw) 1fr; height:100%; }
-    .side { overflow:auto; background:#fff; border-right:1px solid #dce3ef; padding:18px 18px 28px; }
-    .mapwrap { position:relative; }
-    #map { height:100%; width:100%; }
-    h1 { margin:0 0 8px; font-size:28px; line-height:1.15; }
-    .sub { color:#586377; font-size:14px; line-height:1.45; margin-bottom:14px; }
-    .note { background:#eef4ff; border:1px solid #cddbff; color:#173ea5; border-radius:14px; padding:12px 14px; font-size:13px; line-height:1.45; margin-bottom:14px; }
-    .legend { background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; border-radius:14px; padding:12px 14px; font-size:13px; line-height:1.45; margin-bottom:16px; }
-    .buttons { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
-    button { border:1px solid #d6deeb; background:#fff; border-radius:999px; padding:9px 12px; cursor:pointer; font-size:13px; font-weight:700; color:#1d2b46; }
-    button:hover { background:#f8fbff; }
-    button.primary { background:#173ea5; color:#fff; border-color:#173ea5; }
-    .page-switch { display:flex; gap:8px; margin:0 0 14px; }
-    .page-switch a { flex:1; text-align:center; border:1px solid #d6deeb; border-radius:12px; padding:9px 10px; color:#1d2b46; font-size:13px; font-weight:800; text-decoration:none; background:#fff; }
-    .page-switch a:hover { background:#f8fbff; }
-    .page-switch a[aria-current="page"] { background:#173ea5; color:#fff; border-color:#173ea5; }
-    .day { border:1px solid #e4e9f2; border-radius:16px; margin-bottom:10px; background:#fbfcfe; overflow:hidden; }
-    .day:hover { border-color:#bfd0f5; background:#f7faff; }
-    .day.is-active { border-color:#173ea5; box-shadow:0 0 0 2px rgba(23,62,165,.12); background:#f7faff; }
-    .day-main { width:100%; border:0; background:transparent; border-radius:0; padding:12px; color:inherit; cursor:pointer; text-align:left; }
-    .day-main:hover { background:#f7faff; }
-    .day h3 { margin:0 0 4px; font-size:16px; }
-    .meta { color:#5b667a; font-size:13px; margin-bottom:7px; }
-    .pill { display:inline-block; font-size:12px; font-weight:700; color:#173ea5; background:#eef3ff; padding:4px 8px; border-radius:999px; margin-bottom:8px; }
-    .mini { font-size:12px; color:#6a7488; line-height:1.45; }
-    .route { margin:8px 0 0 18px; padding:0; font-size:13px; line-height:1.45; }
-    .chips { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
-    .chip { display:inline-block; font-size:11px; font-weight:700; color:#173ea5; background:#eef3ff; padding:4px 7px; border-radius:999px; }
-    .day-details { border-top:1px solid #e4e9f2; padding:0 12px 12px; }
-    .day-details summary { cursor:pointer; color:#173ea5; font-size:13px; font-weight:800; padding:10px 0; }
-    .facts { display:grid; grid-template-columns:1fr; gap:7px; margin-bottom:10px; }
-    .fact { background:#fff; border:1px solid #e4e9f2; border-radius:11px; padding:8px 9px; font-size:12px; line-height:1.4; }
-    .fact strong { display:block; color:#5b667a; font-size:11px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:3px; }
-    .advice-grid { display:grid; gap:8px; }
-    .advice { background:#fff; border:1px solid #e4e9f2; border-radius:12px; padding:10px; font-size:12px; line-height:1.45; }
-    .advice h4 { margin:0 0 6px; font-size:13px; color:#172033; }
-    .advice p { margin:0; }
-    .advice ul { margin:0; padding-left:17px; }
-    .advice li + li { margin-top:4px; }
-    .maplink { display:inline-flex; margin-top:10px; color:#173ea5; font-weight:800; font-size:12px; }
-    .optional { border-style:dashed; background:#fffaf8; }
-    .swatch { display:inline-block; width:10px; height:10px; border-radius:999px; margin-right:7px; vertical-align:middle; }
-    .overview-panel { display:grid; gap:12px; margin-bottom:16px; }
-    .overview-card { border:1px solid #e4e9f2; border-radius:16px; background:#fbfcfe; padding:12px; }
-    .overview-card h2 { margin:0 0 9px; font-size:16px; }
-    .stat-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px; }
-    .stat { background:#eef4ff; border-radius:12px; padding:10px; }
-    .stat strong { display:block; color:#173ea5; font-size:18px; line-height:1.1; }
-    .stat span { color:#5b667a; font-size:12px; }
-    .stay-list { display:grid; gap:7px; }
-    .stay { display:flex; justify-content:space-between; gap:10px; border:0; border-top:1px solid #e4e9f2; border-radius:0; background:transparent; width:100%; padding:7px 0 0; color:inherit; font-size:13px; line-height:1.35; text-align:left; }
-    .stay:first-child { border-top:0; padding-top:0; }
-    button.stay { cursor:pointer; font-weight:400; }
-    button.stay:hover { background:#f8fbff; color:#173ea5; }
-    .stay.is-muted { color:#64748b; }
-    .stay span { color:#5b667a; text-align:right; white-space:nowrap; }
-    .block-plan { display:grid; gap:12px; margin-bottom:16px; }
-    .block-card { border:1px solid #dfe7f3; border-radius:18px; background:#fbfcfe; overflow:visible; }
-    .block-card > summary { list-style:none; cursor:pointer; }
-    .block-card > summary::-webkit-details-marker { display:none; }
-    .block-hero { background:#eef4ff; border-bottom:1px solid #d6e3fb; padding:14px; }
-    .block-hero h2 { margin:0 0 6px; font-size:20px; line-height:1.2; }
-    .block-hero p { margin:0; color:#4f5f78; font-size:13px; line-height:1.45; }
-    .block-sticky { position:-webkit-sticky; position:sticky; top:0; z-index:30; display:flex; align-items:center; justify-content:space-between; gap:10px; background:rgba(255,255,255,.98); border:1px solid #dfe7f3; border-left:0; border-right:0; padding:10px 12px; backdrop-filter:blur(12px); box-shadow:0 8px 22px rgba(15,23,42,.08); }
-    .block-sticky.is-fixed { position:fixed; top:var(--sticky-top, 0px); left:var(--sticky-left, 0px); width:var(--sticky-width, auto); box-sizing:border-box; }
-    .block-sticky.is-fixed + .block-section { margin-top:var(--sticky-height, 44px); }
-    .block-sticky strong { display:block; font-size:13px; }
-    .block-sticky span { color:#5b667a; font-size:12px; }
-    .sticky-actions { display:flex; gap:6px; align-items:center; }
-    .sticky-actions a, .collapse-block { border:1px solid #d6deeb; border-radius:10px; padding:8px 10px; font-size:12px; font-weight:800; white-space:nowrap; background:#fff; color:#173ea5; text-decoration:none; }
-    .collapse-block { color:#1d2b46; }
-    .block-section { padding:14px; border-top:1px solid #e4e9f2; }
-    .block-section:first-child { border-top:0; }
-    .block-section h3 { margin:0 0 8px; font-size:15px; }
-    .block-section p { margin:0; font-size:13px; line-height:1.55; color:#344258; }
-    .block-section p + p { margin-top:8px; }
-    .block-section ul, .block-section ol { margin:0; padding-left:18px; font-size:13px; line-height:1.55; color:#344258; }
-    .block-section li + li { margin-top:4px; }
-    .block-facts { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px; margin-top:12px; }
-    .block-fact { background:#fff; border:1px solid #dfe7f3; border-radius:12px; padding:9px; font-size:12px; line-height:1.4; }
-    .block-fact strong { display:block; color:#5b667a; font-size:11px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:3px; }
-    .drive-grid { display:grid; gap:8px; }
-    .drive-card { background:#fff; border:1px solid #dfe7f3; border-radius:12px; padding:10px; }
-    .drive-card strong { display:block; margin-bottom:5px; }
-    .day-card { border:1px solid #dfe7f3; border-radius:14px; background:#fff; margin-top:10px; overflow:hidden; }
-    .day-card summary { cursor:pointer; padding:12px; font-weight:900; color:#173ea5; background:#f7faff; }
-    .day-card-body { display:grid; gap:10px; padding:12px; border-top:1px solid #dfe7f3; }
-    .jump-link { display:inline-flex; align-items:center; justify-content:center; border-radius:12px; background:#173ea5; color:#fff; padding:10px 12px; font-size:13px; font-weight:900; text-decoration:none; margin-top:12px; }
-    .travel-day { border-color:#fed7aa; background:#fffaf2; }
-    .travel-day summary { background:#fff7ed; color:#9a3412; }
-    .travel-day .day-card-body { background:#fffaf2; }
-    .route-actions { display:flex; flex-wrap:wrap; gap:8px; }
-    .route-actions a, .route-actions button { display:inline-flex; align-items:center; justify-content:center; border-radius:12px; padding:9px 11px; font-size:12px; font-weight:900; text-decoration:none; }
-    .route-actions a { background:#f97316; color:#fff; border:1px solid #f97316; }
-    .route-actions a.secondary { background:#fff7ed; color:#9a3412; border:1px solid #fed7aa; }
-    .route-actions button { background:#173ea5; color:#fff; border:1px solid #173ea5; }
-    .route-actions button.secondary { background:#eef4ff; color:#173ea5; border-color:#d6e3fb; }
-    .scan-box { background:#f8fbff; border:1px solid #dfe7f3; border-radius:12px; padding:10px; }
-    .mobile-nav { display:none; }
-    .zoomhint { position:absolute; right:14px; top:14px; z-index:500; background:rgba(255,255,255,.96); border:1px solid #dce3ef; border-radius:12px; padding:10px 12px; font-size:12px; color:#475569; max-width:280px; box-shadow:0 8px 24px rgba(15,23,42,.08); }
-    .map-control { position:absolute; left:14px; top:14px; z-index:510; width:min(360px, calc(100% - 28px)); background:rgba(255,255,255,.97); border:1px solid #dce3ef; border-radius:14px; padding:10px; box-shadow:0 10px 28px rgba(15,23,42,.10); backdrop-filter:blur(12px); }
-    .map-control summary { cursor:pointer; font-size:13px; font-weight:900; color:#172033; list-style:none; }
-    .map-control summary::-webkit-details-marker { display:none; }
-    .map-control-body { display:grid; gap:8px; margin-top:9px; }
-    .map-control label { font-size:11px; font-weight:900; color:#5b667a; text-transform:uppercase; letter-spacing:.04em; }
-    .map-control select { width:100%; border:1px solid #d6deeb; border-radius:11px; background:#fff; color:#172033; padding:9px 10px; font-size:13px; font-weight:700; }
-    .map-control-actions { display:flex; gap:8px; }
-    .map-control-actions button { flex:1; border-radius:11px; }
-    .map-control-actions button.primary { background:#173ea5; color:#fff; border-color:#173ea5; }
-    .map-status { min-height:16px; font-size:12px; color:#5b667a; line-height:1.35; }
-    @media (max-width: 980px) {
-      html, body { height:auto; min-height:100%; overflow-x:hidden; }
-      body { padding-bottom:76px; }
-      .layout { display:flex; flex-direction:column; min-height:100vh; height:auto; }
-      .mapwrap { order:1; height:calc(100vh - 76px); min-height:520px; border-bottom:1px solid #dce3ef; background:#dbeafe; }
-      #map { height:100%; min-height:360px; }
-      .side { order:2; overflow:visible; border-right:none; padding:12px 12px 24px; }
-      h1 { font-size:22px; }
-      .sub { margin-bottom:10px; }
-      .note { padding:10px 12px; margin-bottom:10px; }
-      .buttons { background:rgba(255,255,255,.96); padding:0 0 10px; margin:0 0 10px; }
-      .buttons button { flex:1 1 140px; border-radius:12px; }
-      .zoom-button { display:none; }
-      .page-switch { display:none; }
-      .day { margin-bottom:8px; border-radius:14px; }
-      .day-main { padding:10px; }
-      .day h3 { font-size:15px; line-height:1.25; }
-      .meta { font-size:12px; margin-bottom:5px; }
-      .pill { font-size:11px; margin-bottom:0; }
-      .chips, .day-main .mini, .day-main .route { display:none; }
-      .day-details { padding:0 10px 10px; }
-      .facts { grid-template-columns:1fr; }
-      .advice { padding:9px; }
-      .block-facts { grid-template-columns:1fr; }
-      .block-sticky { margin:0 -1px; top:0; }
-      .block-sticky span { display:block; line-height:1.3; }
-      .zoomhint { display:none; }
-      .map-control { left:10px; right:10px; top:10px; width:auto; padding:9px; }
-      .map-control summary { font-size:12px; }
-      .map-control select { font-size:12px; padding:8px 9px; }
-      .map-control-actions button { font-size:12px; padding:8px 9px; }
-      .mobile-nav { position:fixed; left:0; right:0; bottom:0; z-index:1000; display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; padding:8px 10px calc(8px + env(safe-area-inset-bottom)); background:rgba(255,255,255,.96); border-top:1px solid #dce3ef; box-shadow:0 -12px 32px rgba(15,23,42,.10); }
-      .mobile-nav button { border-radius:14px; padding:9px 8px; font-size:12px; }
-      .mobile-nav button[aria-current="true"] { background:#173ea5; color:#fff; border-color:#173ea5; }
-      body[data-view="overview"] .mapwrap,
-      body[data-view="overview"] .buttons,
-      body[data-view="overview"] #blockplan { display:none; }
-      body[data-view="overview"] .overview-panel { display:grid; }
-      body[data-view="map"] .side { display:none; }
-      body[data-view="map"] .mapwrap { display:block; }
-      body[data-view="blocks"] .mapwrap,
-      body[data-view="blocks"] .overview-panel,
-      body[data-view="blocks"] .buttons { display:none; }
-      body[data-view="blocks"] #blockplan { display:grid; }
-    }
-    @media (max-width: 520px) {
-      .mapwrap { height:calc(100vh - 76px); min-height:480px; }
-      #map { min-height:310px; }
-      .sub { display:none; }
-      .note { font-size:12px; }
-      .stat-grid { grid-template-columns:1fr; }
-      .block-sticky { align-items:flex-start; }
-      .sticky-actions { flex-shrink:0; }
-      .sticky-actions a, .collapse-block { padding:7px 8px; }
-    }
-  </style>
+  <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css" />
+  <link rel="stylesheet" href="routekaart.css" />
 </head>
 <body data-view="overview">
   <div class="layout">
@@ -195,7 +28,7 @@
         </div>
         <div class="overview-card">
           <h2>Routeflow nu in kaart</h2>
-          <div class="mini">Podgorica Airport → Podgorica → Virpazar / Lake Skadar → Perast / Kotor Bay → Žabljak / Durmitor → Tjentište. De volgende blokken voegen we later stap voor stap toe.</div>
+          <div class="mini">Podgorica Airport → Podgorica → Virpazar / Lake Skadar → Perast / Kotor Bay → Žabljak / Durmitor → Tjentište / Sutjeska → Sarajevo → Mostar / Herzegovina → Trebinje → Podgorica Airport.</div>
           <div class="route-actions" style="margin-top:10px;">
             <button type="button" onclick="showAll()">Toon huidige route in kaart</button>
           </div>
@@ -207,11 +40,11 @@
             <button class="stay" type="button" data-block-target="virpazar-block"><strong>14-15 juni · Virpazar / Lake Skadar</strong><span>2 nachten</span></button>
             <button class="stay" type="button" data-block-target="perast-block"><strong>16-19 juni · Perast / Kotor Bay</strong><span>4 nachten</span></button>
             <button class="stay" type="button" data-block-target="durmitor-block"><strong>20-23 juni · Žabljak / Durmitor</strong><span>4 nachten</span></button>
-            <div class="stay is-muted"><strong>24 juni · Tjentište / Sutjeska</strong><span>1 nacht</span></div>
-            <div class="stay is-muted"><strong>25-26 juni · Sarajevo</strong><span>2 nachten</span></div>
-            <div class="stay is-muted"><strong>27-28 juni · Mostar</strong><span>2 nachten</span></div>
-            <div class="stay is-muted"><strong>29 juni · Trebinje</strong><span>1 nacht</span></div>
-            <div class="stay is-muted"><strong>30 juni · vlucht vanaf Podgorica</strong><span>16:30</span></div>
+            <button class="stay" type="button" data-block-target="sutjeska-block"><strong>24 juni · Tjentište / Sutjeska</strong><span>1 nacht</span></button>
+            <button class="stay" type="button" data-block-target="sarajevo-block"><strong>25-26 juni · Sarajevo</strong><span>2 nachten</span></button>
+            <button class="stay" type="button" data-block-target="mostar-block"><strong>27-28 juni · Mostar / Herzegovina</strong><span>2 nachten</span></button>
+            <button class="stay" type="button" data-block-target="trebinje-block"><strong>29 juni · Trebinje</strong><span>1 nacht</span></button>
+            <button class="stay" type="button" data-block-target="final-day-block"><strong>30 juni · vlucht vanaf Podgorica</strong><span>±17:00</span></button>
           </div>
         </div>
       </section>
@@ -976,10 +809,958 @@
             </div>
           </section>
         </details>
+        <details class="block-card" id="sutjeska-block">
+          <summary>
+            <div class="block-hero">
+              <h2>Tjentište / Sutjeska</h2>
+              <p>24-25 juni · 1 nacht · slimme natuur- en overgangsstop tussen Durmitor en Sarajevo.</p>
+            </div>
+          </summary>
+          <div class="block-sticky">
+            <div>
+              <strong>Tjentište / Sutjeska</strong>
+              <span>24-25 juni · 1 nacht · korte Sutjeska-stop</span>
+            </div>
+            <div class="sticky-actions">
+              <a href="#sutjeska-days">Dagen</a>
+              <button class="collapse-block" type="button">Inklappen</button>
+            </div>
+          </div>
+
+          <section class="block-section">
+            <h3>Samenvatting voor snelle scan</h3>
+            <div class="scan-box">
+              <p><strong>Tjentište / Sutjeska · 1 nacht.</strong><br>Check-in: woensdag 24 juni 2026<br>Check-out: donderdag 25 juni 2026</p>
+              <p><strong>Aankomstrit:</strong> Žabljak → Piva Lake viewpoint → Piva Monastery → Tjentište · ongeveer 150-170 km · 3-4 uur met stops, exclusief eventuele grensvertraging.</p>
+              <p><strong>Vertrekrit:</strong> Tjentište → Valley of Heroes → Prijevor-optie → Sarajevo · ongeveer 110-150 km, afhankelijk van Prijevor-keuze · 2,5-3 uur netto naar Sarajevo, exclusief stops; langer met Prijevor.</p>
+              <p><strong>Rol in de reis:</strong> korte maar waardevolle natuur- en overgangsstop tussen Durmitor en Sarajevo. Dit voorkomt dat Žabljak → Sarajevo één lange reisdag wordt en voegt Sutjeska National Park, Valley of Heroes en ruig Bosnisch berglandschap toe.</p>
+              <p><strong>Hoofdadvies:</strong> gebruik Tjentište als slimme tussenstop, niet als uitgebreid hikeblok. De aankomstdag draait om Piva; de vertrekochtend om Valley of Heroes en eventueel één korte natuur- of uitzichtstop. Prijevor alleen bij helder weer, goede wegcondities en genoeg energie.</p>
+              <p><strong>Must-do:</strong> scenic rit via Piva, Piva Lake viewpoint, Valley of Heroes / Tjentište monument, rustige avond in of rond Tjentište en Bosnisch berglandschap ervaren.</p>
+              <p><strong>Optioneel:</strong> Piva Monastery, Prijevor viewpoint, korte wandeling rond Tjentište, Dragoš Sedlo / uitzicht richting Perućica alleen als praktisch en veilig bereikbaar, Sutjeska National Park visitor/info stop als beschikbaar en extra fotostops onderweg.</p>
+              <p><strong>Low-energy:</strong> alleen Piva viewpoint op de aankomstdag, direct naar accommodatie, Valley of Heroes kort in de ochtend, geen Prijevor en vroeg door naar Sarajevo.</p>
+              <p><strong>Niet doen:</strong> Maglić beklimming, lange hike naar Trnovačko Lake, Prijevor forceren bij slecht weer of twijfelachtige weg, aankomstdag volstoppen, boeken zonder dineroptie of deze stop behandelen als volwaardig meerdaags natuurblok.</p>
+              <p><strong>Accommodatie:</strong> kies comfort boven charme. Belangrijk zijn goed bed, parking, diner of halfpension op locatie of dichtbij, rustige kamer, makkelijke bereikbaarheid en duidelijke check-in. Als Tjentište tegenvalt, kan richting Foča praktischer zijn.</p>
+            </div>
+          </section>
+
+          <section class="block-section">
+            <h3>Blokinformatie</h3>
+            <div class="block-facts">
+              <div class="block-fact"><strong>Bloknaam</strong>Tjentište / Sutjeska</div>
+              <div class="block-fact"><strong>Check-in</strong>woensdag 24 juni 2026</div>
+              <div class="block-fact"><strong>Check-out</strong>donderdag 25 juni 2026</div>
+              <div class="block-fact"><strong>Aantal nachten</strong>1</div>
+              <div class="block-fact"><strong>Basisplek</strong>Tjentište of directe omgeving; eventueel richting Foča bij duidelijk beter comfort</div>
+              <div class="block-fact"><strong>Tempo</strong>rustig, kort en niet volgepropt</div>
+              <div class="block-fact"><strong>Karakter</strong>ruige Bosnische bergen, nationaal park, historisch monument, groen, diepe valleien en weinig stadse drukte</div>
+              <div class="block-fact"><strong>Zwangerschap</strong>goed geschikt als het programma licht blijft</div>
+            </div>
+            <p><strong>Rol in de reis:</strong> dit blok vormt de overgang van Montenegro naar Bosnië en van Durmitor naar Sarajevo. Zonder deze stop zou Žabljak → Sarajevo langer, zwaarder en minder interessant worden. Met Tjentište wordt de reisdag gebroken en krijgen jullie extra natuur- en geschiedenislaag zonder dat de route onlogisch wordt.</p>
+            <p><strong>Tempo:</strong> rustig. Dit blok is kort en moet niet worden volgepropt. Het doel is aankomen, slapen, de sfeer van Sutjeska meekrijgen en de volgende dag relaxed door naar Sarajevo.</p>
+            <p><strong>Zwangerschap-vriendelijkheid:</strong> Valley of Heroes, korte stops en uitzichtpunten passen goed. Lange hikes, Maglić, Trnovačko Lake en ruwe bergwegen naar afgelegen trailheads zijn niet geschikt als basis. Prijevor alleen als wegconditie, weer en energie goed zijn.</p>
+            <p><strong>Waarom dit blok goed past:</strong> Tjentište / Sutjeska is een slimme tussenstop die praktisch en inhoudelijk werkt. Praktisch omdat het de overgang van Žabljak naar Sarajevo opknipt. Inhoudelijk omdat het een ruiger, minder toeristisch stuk Bosnië toevoegt, met Sutjeska National Park en de indrukwekkende Valley of Heroes.</p>
+            <ul>
+              <li>Breekt de rit van Durmitor naar Sarajevo.</li>
+              <li>Voegt Bosnische natuur toe vóór de stad Sarajevo.</li>
+              <li>Geeft historische diepgang via Valley of Heroes.</li>
+              <li>Laat de route minder gehaast voelen.</li>
+              <li>Mooie overgang van berglandschap naar stad.</li>
+              <li>Off the beaten path-gevoel zonder extra land of grote omweg.</li>
+              <li>Kan licht en kort worden ingevuld.</li>
+            </ul>
+            <p><strong>Kernadvies:</strong> maak van dit blok geen zware wandelbestemming. Gebruik het als mooie, rustige, strategische stop. De aankomstdag draait om Piva en de rit. De vertrekochtend draait om Valley of Heroes en eventueel één natuur-/uitzichtstop. Daarna op tijd naar Sarajevo.</p>
+            <p><strong>Belangrijkste valkuil:</strong> te veel willen doen omdat Sutjeska groot en spectaculair is. De mooiste hikes zijn vaak lang, ruig of logistiek ingewikkeld. Voor deze reis is dat niet de bedoeling; de stop is het sterkst als hij compact blijft.</p>
+          </section>
+
+          <section class="block-section">
+            <h3>Accommodatieadvies Tjentište / Sutjeska</h3>
+            <ul>
+              <li><strong>Praktisch hotel of lodge in Tjentište:</strong> beste keuze als comfort, diner en parking goed geregeld zijn. Ideaal voor Valley of Heroes en korte Sutjeska-ochtend.</li>
+              <li><strong>Guesthouse / pension in of rond Tjentište:</strong> kan sfeervol en lokaal zijn, maar alleen kiezen met goede reviews op comfort, eten en bereikbaarheid.</li>
+              <li><strong>Accommodatie richting Foča:</strong> praktischer als Tjentište-aanbod matig is. Iets minder parkgevoel, maar mogelijk comfortabeler.</li>
+              <li><strong>Afgelegen natuuraccommodatie:</strong> alleen kiezen als alles goed geregeld is; niet ideaal voor één nacht als bereikbaarheid of eten onduidelijk is.</li>
+            </ul>
+            <p><strong>Must-have:</strong> parking, goed bed, dineroptie op locatie of heel dichtbij, goed ontbijt of vroege ontbijtoptie, rustige kamer, makkelijke bereikbaarheid, duidelijke check-ininformatie, goede reviews op hygiëne en comfort, geen ingewikkelde onverharde toegangsweg en laat genoeg kunnen dineren na aankomst.</p>
+            <p><strong>Nice-to-have:</strong> uitzicht op bergen of groen, restaurant / halfpension, terras of tuin, koelkastje, zitruimte, lunchpakketoptie en vroege check-out.</p>
+            <p><strong>Minder belangrijk:</strong> luxe uitstraling, spa/wellness, zwembad, midden in een levendig dorp zitten en veel faciliteiten.</p>
+            <p><strong>Beste ligging:</strong> Tjentište zelf is het beste voor Valley of Heroes en Sutjeska-sfeer; net buiten Tjentište kan goed zijn als het comfortabeler en rustig is; richting Foča is praktisch bij betere hotels of restaurants; te afgelegen in de bergen liever vermijden voor één nacht.</p>
+            <p><strong>Waar extra op letten:</strong> diner beschikbaarheid, recente reviews, weg ernaartoe, geschiktheid voor aankomst na lange rit, parkeren, vroeg ontbijt, bedcomfort, afstand naar Valley of Heroes en afstand naar Sarajevo.</p>
+          </section>
+
+          <section class="block-section">
+            <h3>Activiteiten en kostenindicatie voor dit blok</h3>
+            <ul>
+              <li><strong>Piva Lake viewpoint:</strong> prioriteit hoog op aankomstdag. Gratis of kleine parkeerkosten. Belangrijkste scenic stop tussen Žabljak en Tjentište.</li>
+              <li><strong>Piva Monastery:</strong> prioriteit middel. Meestal laag, donatie of kleine kosten mogelijk. Rustige cultuurstop als timing goed is.</li>
+              <li><strong>Valley of Heroes / Tjentište Memorial:</strong> prioriteit hoog. Meestal laag, parkeren of kleine lokale kosten mogelijk. Must-do van het blok.</li>
+              <li><strong>Prijevor viewpoint:</strong> optioneel. Vooral brandstof en eventuele park- of toegangsgerelateerde kosten. Alleen bij helder weer, goede weg en genoeg energie.</li>
+              <li><strong>Sutjeska National Park korte stop:</strong> optioneel. Kosten afhankelijk van eventuele entree of lokale regels. Licht en kort houden.</li>
+              <li><strong>Koffie / lunch / snacks:</strong> praktisch, ongeveer €20-50 voor het blok. Neem genoeg mee, voorzieningen kunnen beperkt zijn.</li>
+              <li><strong>Parkeren / kleine kosten:</strong> praktisch, ongeveer €5-20. Cashbuffer handig.</li>
+            </ul>
+            <p><strong>Totaal realistisch activiteitenbudget:</strong> €20-80 exclusief accommodatie en normale maaltijden. Ruimer budget met extra park-/uitzichtstop, uitgebreid eten of lokale gids: €80-150.</p>
+          </section>
+
+          <section class="block-section">
+            <h3>Zwangerschap-vriendelijke aandachtspunten</h3>
+            <ul>
+              <li><strong>Routebelasting:</strong> dit blok bevat twee reisdagen achter elkaar. Houd het programma licht.</li>
+              <li><strong>Wegen:</strong> bergwegen, grensovergang en smallere routes kunnen vermoeiend zijn. Plan stops en neem tijd.</li>
+              <li><strong>Hydratatie:</strong> neem water en snacks mee, want voorzieningen kunnen beperkter zijn dan in Kotor, Žabljak of Sarajevo.</li>
+              <li><strong>Activiteiten:</strong> Valley of Heroes is passend als basis. Prijevor is optioneel. Lange hikes zijn niet passend als standaard.</li>
+              <li><strong>Prijevor:</strong> alleen doen bij goed weer, goede wegcondities en genoeg energie. Niet forceren.</li>
+              <li><strong>Maglić / Trnovačko Lake:</strong> niet opnemen als basis. Te lang, te zwaar en logistiek te intensief voor deze reisopzet.</li>
+              <li><strong>Middagplanning:</strong> zorg dat jullie donderdag niet te laat in Sarajevo aankomen, zodat de dag niet eindigt met stress.</li>
+              <li><strong>Accommodatie:</strong> comfort is belangrijker dan charme. Een slechte nacht maakt het Sarajevo-blok minder fijn.</li>
+              <li><strong>Eten:</strong> boek een plek met diner of check vooraf waar jullie eten. Niet pas na aankomst moeten zoeken.</li>
+              <li><strong>Rust:</strong> de avond in Tjentište mag heel simpel zijn: eten, douchen, slapen.</li>
+            </ul>
+          </section>
+
+          <section class="block-section">
+            <h3>Wat wel en niet doen</h3>
+            <div class="drive-grid">
+              <div class="drive-card">
+                <strong>Wel doen</strong>
+                <ul><li>Tjentište als korte maar waardevolle tussenstop houden.</li><li>Piva-route gebruiken als mooie aankomstrit.</li><li>Valley of Heroes bezoeken.</li><li>Comfortabele accommodatie met dineroptie kiezen.</li><li>Prijevor alleen als optionele bonus zien.</li><li>Donderdag op tijd naar Sarajevo vertrekken.</li><li>Genoeg snacks en water meenemen.</li><li>Huurautodocumenten voor grensovergang klaarhouden.</li><li>De stop licht en praktisch houden.</li></ul>
+              </div>
+              <div class="drive-card">
+                <strong>Niet doen</strong>
+                <ul><li>Maglić beklimmen.</li><li>Trnovačko Lake hike plannen.</li><li>Lange hike in Perućica-regio opnemen.</li><li>Prijevor forceren bij mist, regen of vermoeidheid.</li><li>Te veel extra stops op de Piva-route toevoegen.</li><li>Slapen op een plek zonder dineroptie.</li><li>Deze ene nacht behandelen alsof het een volledig natuurblok is.</li><li>Donderdag te laat in Sarajevo aankomen.</li><li>Sarajevo-avond volplannen na een intensieve ochtend.</li></ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="block-section" id="sutjeska-days">
+            <h3>Dagen binnen dit blok</h3>
+            <details class="day-card travel-day">
+              <summary>Dag 12 · woensdag 24 juni · aankomstdag naar Tjentište</summary>
+              <div class="day-card-body">
+                <p><strong>Let op:</strong> deze dag is een overlapdag. In dit blok is hij vooral de scenic aankomstrit via Piva, grensovergang naar Bosnië en rustige aankomst in Sutjeska.</p>
+                <div class="block-facts">
+                  <div class="block-fact"><strong>Start</strong>Žabljak / Durmitor</div>
+                  <div class="block-fact"><strong>Eindpunt</strong>Tjentište / Sutjeska</div>
+                  <div class="block-fact"><strong>Slapen</strong>Tjentište / Sutjeska</div>
+                  <div class="block-fact"><strong>Route</strong>Žabljak → Piva Lake viewpoint → Piva Monastery → Tjentište</div>
+                  <div class="block-fact"><strong>Afstand</strong>ongeveer 150-170 km</div>
+                  <div class="block-fact"><strong>Rijtijd</strong>ongeveer 3-4 uur met stops, exclusief eventuele grensvertraging</div>
+                  <div class="block-fact"><strong>Dagtype</strong>scenic transferdag, meer, kloof, grensovergang</div>
+                  <div class="block-fact"><strong>Hoofddoel</strong>mooie maar beheerste overgang van Durmitor naar Bosnië</div>
+                  <div class="block-fact"><strong>Belangrijkste stops</strong>Piva Lake viewpoint en eventueel Piva Monastery</div>
+                  <div class="block-fact"><strong>Niet doen</strong>te veel extra omwegen toevoegen</div>
+                </div>
+                <section class="advice"><h4>Hoofdadvies</h4><p>Maak dit een fotogenieke transferdag, geen volle excursiedag. De route via Piva geeft al veel landschap. Kies maximaal twee echte stops en zorg dat jullie op tijd in Tjentište aankomen.</p></section>
+                <section class="advice"><h4>Ideale dagindeling</h4><ul><li>Ochtend: ontbijt en check-out in Žabljak.</li><li>Ochtend / late ochtend: vertrek richting Piva.</li><li>Late ochtend: Piva Lake viewpoint.</li><li>Middag: Piva Monastery of lunchstop.</li><li>Middag / namiddag: grensovergang en door naar Tjentište.</li><li>Avond: check-in, diner en rust.</li></ul></section>
+                <section class="advice"><h4>Hoofdactiviteiten onderweg</h4><ul><li><strong>Piva Lake viewpoint:</strong> fotostop / scenic viewpoint met turquoise water, klooflandschap en een totaal andere sfeer dan Durmitor. Lage fysieke belasting; korte stop, niet te lang rekken. Beste moment is onderweg, afhankelijk van licht en timing.</li><li><strong>Piva Monastery:</strong> cultuurstop en rustige onderbreking van de rit. Lage fysieke belasting; alleen doen als timing en energie goed zijn, niet verplicht als de rit langer voelt dan verwacht.</li></ul></section>
+                <section class="advice"><h4>Low-energy alternatief</h4><ul><li>Vertrek uit Žabljak.</li><li>Alleen korte fotostop bij Piva.</li><li>Lunch/snack onderweg.</li><li>Door naar Tjentište.</li><li>Check-in en rust.</li><li>Geen extra omweg of lange stop.</li></ul></section>
+                <section class="advice"><h4>Extra opties bij meer energie</h4><ul><li>Meer fotostops langs Piva.</li><li>Korte wandeling bij een viewpoint.</li><li>Uitgebreidere stop bij Piva Monastery.</li><li>Aankomstwandeling rond Tjentište als het nog goed voelt.</li><li>Korte stop bij Valley of Heroes al op de aankomstdag als jullie vroeg aankomen, maar liever bewaren voor donderdagochtend.</li></ul></section>
+                <section class="advice"><h4>Praktische tips</h4><ul><li>Neem genoeg snacks en water mee.</li><li>Grens kan tijd kosten, houd marge.</li><li>Tank op tijd.</li><li>Download offline kaart.</li><li>Check huurautopapieren voor Bosnië.</li><li>Boek Tjentište op een plek met goed diner of halfpension.</li><li>Rijd niet te laat weg uit Žabljak.</li><li>Maak de dag niet te vol, want het is ook een grens- en bergwegdag.</li><li>Neem paspoort/ID, groene kaart en huurautodocumenten makkelijk bereikbaar mee.</li></ul></section>
+                <section class="advice"><h4>Google Maps en kaartviewer</h4><p>Žabljak → Piva Lake Viewpoint → Piva Monastery → Tjentište.</p><div class="route-actions"><a href="https://www.google.com/maps/dir/?api=1&origin=%C5%BDabljak%2C%20Montenegro&destination=Tjenti%C5%A1te%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Piva%20Lake%20Viewpoint%2C%20Montenegro%7CPiva%20Monastery%2C%20Montenegro" target="_blank" rel="noopener">Open in Google Maps</a><button class="secondary" type="button" data-route-view="to-tjentiste">Open in kaart</button></div></section>
+              </div>
+            </details>
+
+            <details class="day-card travel-day">
+              <summary>Dag 13 · donderdag 25 juni · vertrekdag naar Sarajevo</summary>
+              <div class="day-card-body">
+                <p><strong>Let op:</strong> deze dag is een overlapdag. In het Tjentište-blok is hij vooral een korte Sutjeska-ochtend en daarna op tijd door naar Sarajevo.</p>
+                <div class="block-facts">
+                  <div class="block-fact"><strong>Start</strong>Tjentište / Sutjeska</div>
+                  <div class="block-fact"><strong>Eindpunt</strong>Sarajevo</div>
+                  <div class="block-fact"><strong>Slapen</strong>Sarajevo</div>
+                  <div class="block-fact"><strong>Route</strong>Tjentište → Valley of Heroes → eventueel Prijevor / uitzichtstop → Sarajevo</div>
+                  <div class="block-fact"><strong>Afstand</strong>ongeveer 110-150 km, afhankelijk van Prijevor-keuze</div>
+                  <div class="block-fact"><strong>Rijtijd</strong>ongeveer 2,5-3 uur netto naar Sarajevo, exclusief stops; langer met Prijevor</div>
+                  <div class="block-fact"><strong>Dagtype</strong>natuur- en geschiedenis-ochtend, daarna transfer naar stad</div>
+                  <div class="block-fact"><strong>Hoofddoel</strong>één of twee Sutjeska-elementen goed doen en relaxed naar Sarajevo</div>
+                  <div class="block-fact"><strong>Belangrijkste stop</strong>Valley of Heroes</div>
+                  <div class="block-fact"><strong>Niet doen</strong>grote Sutjeska-hike plannen vóór de rit naar Sarajevo</div>
+                </div>
+                <section class="advice"><h4>Hoofdadvies</h4><p>Doe in de ochtend één of twee dingen goed en vertrek daarna op tijd naar Sarajevo. Valley of Heroes is de belangrijkste stop. Prijevor of een ander uitzichtpunt is alleen extra als het weer helder is, de wegcondities goed zijn en jullie energie goed is.</p></section>
+                <section class="advice"><h4>Ideale dagindeling</h4><ul><li>Ochtend: ontbijt en check-out.</li><li>Ochtend: Valley of Heroes / Tjentište monument.</li><li>Late ochtend: eventueel korte natuur- of uitzichtstop.</li><li>Middag: rit naar Sarajevo.</li><li>Namiddag: aankomst en check-in Sarajevo.</li><li>Avond: eerste wandeling door Baščaršija en Bosnisch diner.</li></ul></section>
+                <section class="advice"><h4>Valley of Heroes / Tjentište Memorial</h4><p>Dit is de meest logische en waardevolle activiteit bij Tjentište. Het monument is indrukwekkend, ligt praktisch, geeft historische context aan de plek en vraagt geen zware hike. De Valley of Heroes herdenkt de Slag bij Sutjeska uit 1943 en is een van de bekendste monumentale plekken in het gebied.</p><ul><li>Type: historisch monument / fotogenieke stop.</li><li>Fysieke belasting: licht tot matig door trappen en lopen.</li><li>Beste moment: ochtend.</li><li>Geschikt bij zwangerschap: ja, rustig tempo en niet haasten.</li><li>Waarom goed op deze dag: sterke inhoudelijke stop vóór de rit naar Sarajevo.</li></ul></section>
+                <section class="advice"><h4>Prijevor viewpoint</h4><p>Prijevor geeft uitzicht richting de ruige bergwereld van Sutjeska en Maglić. Het ligt ongeveer 20 km van Tjentište en is met de auto bereikbaar, maar de weg en omstandigheden kunnen de rit langer of lastiger maken.</p><ul><li>Alleen doen bij helder weer.</li><li>Alleen doen als de wegconditie goed voelt.</li><li>Alleen doen als jullie vroeg genoeg zijn.</li><li>Niet doen bij regen, mist, vermoeidheid of twijfel.</li><li>Geen must; Valley of Heroes is genoeg als basis.</li></ul></section>
+                <section class="advice"><h4>Andere optionele Sutjeska-stops</h4><ul><li><strong>Dragoš Sedlo / uitzicht richting Perućica:</strong> alleen als het praktisch, veilig bereikbaar en comfortabel voelt.</li><li><strong>Sutjeska National Park visitor/info stop:</strong> alleen als beschikbaar en logisch op de route.</li><li><strong>Extra fotostops onderweg:</strong> prima als ze kort blijven en de aankomst in Sarajevo niet onder druk zetten.</li></ul></section>
+                <section class="advice"><h4>Low-energy alternatief</h4><ul><li>Rustig ontbijt.</li><li>Korte stop bij Valley of Heroes.</li><li>Geen Prijevor.</li><li>Direct door naar Sarajevo.</li><li>Aankomst in Sarajevo rustig houden.</li><li>Avond alleen korte wandeling en diner.</li></ul></section>
+                <section class="advice"><h4>Extra opties bij meer energie</h4><ul><li>Prijevor viewpoint.</li><li>Korte natuurstop onderweg.</li><li>Iets langere tijd bij Valley of Heroes.</li><li>Koffiestop onderweg naar Sarajevo.</li><li>Na aankomst in Sarajevo nog een rustige avondwandeling.</li></ul></section>
+                <section class="advice"><h4>Niet doen</h4><ul><li>Maglić beklimming.</li><li>Trnovačko Lake hike.</li><li>Lange hike in Perućica-regio.</li><li>Uitgebreid Sutjeska-programma én Sarajevo-avond vol plannen.</li><li>Prijevor forceren als de weg of het weer niet prettig voelt.</li></ul></section>
+                <section class="advice"><h4>Praktische tips</h4><ul><li>Vertrek niet te laat uit Tjentište.</li><li>Valley of Heroes liefst in de ochtend doen.</li><li>Prijevor alleen bij goed weer en energie.</li><li>Neem water en snacks mee.</li><li>Houd Sarajevo-avond licht en sfeervol.</li><li>Parkeerlogistiek in Sarajevo vooraf checken.</li><li>Reken met marge voor bergwegen en stadsaankomst.</li><li>Als de accommodatie in Tjentište ontbijt laat serveert, vraag eventueel om vroeg ontbijt.</li></ul></section>
+                <section class="advice"><h4>Google Maps en kaartviewer</h4><p>Tjentište → Valley of Heroes → Prijevor → Sarajevo.</p><div class="route-actions"><a href="https://www.google.com/maps/dir/?api=1&origin=Tjenti%C5%A1te%2C%20Bosnia%20and%20Herzegovina&destination=Sarajevo%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Valley%20of%20Heroes%20Memorial%20Park%2C%20Tjenti%C5%A1te%7CPrijevor%2C%20Bosnia%20and%20Herzegovina" target="_blank" rel="noopener">Open in Google Maps</a><button class="secondary" type="button" data-route-view="to-sarajevo">Open in kaart</button></div></section>
+              </div>
+            </details>
+          </section>
+
+          <section class="block-section">
+            <h3>Google Maps-links voor dit blok</h3>
+            <div class="route-actions">
+              <a href="https://www.google.com/maps/dir/?api=1&origin=%C5%BDabljak%2C%20Montenegro&destination=Tjenti%C5%A1te%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Piva%20Lake%20Viewpoint%2C%20Montenegro%7CPiva%20Monastery%2C%20Montenegro" target="_blank" rel="noopener">Dag 12 aankomstrit</a>
+              <button class="secondary" type="button" data-route-view="to-tjentiste">Dag 12 in kaart</button>
+              <a class="secondary" href="https://www.google.com/maps/dir/?api=1&origin=Tjenti%C5%A1te%2C%20Bosnia%20and%20Herzegovina&destination=Sarajevo%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Valley%20of%20Heroes%20Memorial%20Park%2C%20Tjenti%C5%A1te%7CPrijevor%2C%20Bosnia%20and%20Herzegovina" target="_blank" rel="noopener">Dag 13 vertrekrit</a>
+              <button class="secondary" type="button" data-route-view="to-sarajevo">Dag 13 in kaart</button>
+            </div>
+          </section>
+        </details>
+        <details class="block-card" id="sarajevo-block">
+          <summary>
+            <div class="block-hero">
+              <h2>Sarajevo</h2>
+              <p>25-27 juni · 2 nachten · cultuur, geschiedenis, koffiehuizen, oude stad en foodblok.</p>
+            </div>
+          </summary>
+          <div class="block-sticky">
+            <div>
+              <strong>Sarajevo</strong>
+              <span>25-27 juni · 2 nachten · cultuur- en geschiedenisblok</span>
+            </div>
+            <div class="sticky-actions">
+              <a href="#sarajevo-days">Dagen</a>
+              <button class="collapse-block" type="button">Inklappen</button>
+            </div>
+          </div>
+
+          <section class="block-section">
+            <h3>Samenvatting voor snelle scan</h3>
+            <div class="scan-box">
+              <p><strong>Sarajevo · 2 nachten.</strong><br>Check-in: donderdag 25 juni 2026<br>Check-out: zaterdag 27 juni 2026</p>
+              <p><strong>Aankomstrit:</strong> Tjentište → Valley of Heroes → eventueel Prijevor / uitzichtstop → Sarajevo · ongeveer 110-150 km, afhankelijk van Prijevor-keuze · 2,5-3 uur netto naar Sarajevo, exclusief stops; langer met Prijevor.</p>
+              <p><strong>Vertrekrit:</strong> Sarajevo → Konjic → Jablanica → Mostar · ongeveer 125-145 km · 2,5-3 uur met stops, afhankelijk van verkeer en pauzes.</p>
+              <p><strong>Rol in de reis:</strong> Sarajevo is het belangrijkste cultuur-, geschiedenis- en foodblok van de reis. Na meerdere natuur- en bergblokken geeft Sarajevo een totaal andere laag: Ottomaanse en Oostenrijks-Hongaarse sfeer, koffiehuizen, Baščaršija, oorlogsgeschiedenis, religieuze diversiteit, levendige straten en goed eten.</p>
+              <p><strong>Hoofdadvies:</strong> houd Sarajevo compact en intens, maar niet volgepropt. Gebruik de aankomstavond voor sfeer en eten, de volle dag voor oude stad plus één grotere inhoudelijke activiteit, en de vertrekdag als mooie route door de Neretva-vallei naar Mostar.</p>
+              <p><strong>Must-do:</strong> Baščaršija, Sebilj en oude stad, Latin Bridge, Bosnische koffie / theehuis, cevapi of ander lokaal diner, Tunnel of Hope of een andere sterke historische activiteit en avondwandeling door de oude stad.</p>
+              <p><strong>Optioneel:</strong> Sarajevo Cable Car / Trebević, Gazi Husrev-beg Mosque, Vijećnica, War Childhood Museum, Gallery 11/07/95, Yellow Fortress / uitzichtpunt, Olympic bobsleigh track op Trebević, food tour of korte stadswandeling met gids.</p>
+              <p><strong>Low-energy:</strong> Baščaršija, koffiehuizen, korte wandeling langs Latin Bridge, Vijećnica van buiten, lange lunch, taxi naar Tunnel of Hope of Trebević en geen museummarathon.</p>
+              <p><strong>Niet doen:</strong> te veel zware oorlogsmusea op één dag combineren, Sarajevo als afvinkstad behandelen, auto gebruiken in de oude stad, na aankomst meteen een vol avondprogramma plannen, op de volle dag alles verplicht maken of parkeerlogistiek onderschatten.</p>
+              <p><strong>Accommodatie:</strong> hotel of B&B met goede parking of valet, liefst op loopafstand van Baščaršija of met makkelijke taxi-/tramverbinding. Parking, airco, rustige kamer, comfortabele bedden en bereikbaarheid met bagage zijn belangrijker dan charme.</p>
+            </div>
+          </section>
+
+          <section class="block-section">
+            <h3>Blokinformatie</h3>
+            <div class="block-facts">
+              <div class="block-fact"><strong>Bloknaam</strong>Sarajevo</div>
+              <div class="block-fact"><strong>Check-in</strong>donderdag 25 juni 2026</div>
+              <div class="block-fact"><strong>Check-out</strong>zaterdag 27 juni 2026</div>
+              <div class="block-fact"><strong>Aantal nachten</strong>2</div>
+              <div class="block-fact"><strong>Basisplek</strong>Sarajevo, liefst lopend naar Baščaršija of met goede taxi-/tramverbinding</div>
+              <div class="block-fact"><strong>Tempo</strong>gemiddeld maar compact</div>
+              <div class="block-fact"><strong>Karakter</strong>stad, cultuur, geschiedenis, religieuze diversiteit, koffiehuizen, eten, musea, uitzichtpunten en levendige avondstraten</div>
+              <div class="block-fact"><strong>Zwangerschap</strong>goed geschikt met taxi’s, pauzes en niet te veel zware musea</div>
+            </div>
+            <p><strong>Rol in de reis:</strong> Sarajevo is de culturele en historische kernstad van de route. Na Lake Skadar, Kotor Bay, Durmitor en Sutjeska brengt Sarajevo de reis bewust de stad in. Het is geen citytrip in de citytrip, maar een compacte en sterke cultuurstop. Twee nachten is genoeg om de stad te voelen, zonder de natuurflow van de reis kwijt te raken.</p>
+            <p><strong>Tempo:</strong> gemiddeld maar compact. De stad nodigt uit tot wandelen, eten en kijken, maar de planning moet niet te zwaar worden. Eén volle dag is genoeg als je keuzes maakt: oude stad, één inhoudelijke plek, goed eten en eventueel één uitzichtactiviteit.</p>
+            <p><strong>Zwangerschap-vriendelijkheid:</strong> goed geschikt als jullie niet te veel musea, trappen en lange wandelingen combineren. Gebruik taxi’s slim, plan koffiepauzes, vermijd de heetste middaguren voor lange wandelingen en kies één zware historische activiteit in plaats van meerdere emotioneel intensieve musea op één dag.</p>
+            <p><strong>Waarom dit blok goed past:</strong> Sarajevo geeft de reis een noodzakelijke culturele laag. De stad contrasteert mooi met de natuurblokken ervoor en de Herzegovina-fase erna. De aankomst vanuit Sutjeska zorgt voor een overgang van ruige bergen naar levendige oude stad. De vertrekroute naar Mostar via Konjic en Jablanica maakt het volgende blok ook meteen landschappelijk interessant.</p>
+            <ul>
+              <li>Sterkste cultuur- en geschiedenisblok van de reis.</li>
+              <li>Compacte stadskern die goed te voet te doen is.</li>
+              <li>Veel sfeer in de avond.</li>
+              <li>Goed eten en koffiehuizen.</li>
+              <li>Veel keuze bij slecht weer.</li>
+              <li>Mooie overgang naar de Neretva-vallei en Mostar.</li>
+              <li>Twee nachten geven genoeg tijd zonder te veel hotelwisseldruk.</li>
+            </ul>
+            <p><strong>Kernadvies:</strong> gebruik Sarajevo vooral voor sfeer en inhoud, niet voor een checklist. Aankomstavond: Baščaršija, korte wandeling, Bosnisch diner. Volle dag: oude stad + Latin Bridge + één inhoudelijke activiteit, zoals Tunnel of Hope of Trebević. Vertrekdag: niet nog een zwaar stadsprogramma, maar rustig naar Mostar via Konjic en Jablanica.</p>
+            <p><strong>Belangrijkste valkuil:</strong> te veel zware geschiedenis op één dag plannen. Sarajevo heeft veel indrukwekkende plekken, maar meerdere oorlogsmusea plus Tunnel of Hope plus lange stadswandeling kan emotioneel en fysiek zwaar worden. Kies liever één of twee inhoudelijke onderdelen goed.</p>
+          </section>
+
+          <section class="block-section">
+            <h3>Accommodatieadvies Sarajevo</h3>
+            <ul>
+              <li><strong>Hotel met parking / valet op loopafstand van Baščaršija:</strong> beste keuze als budget het toelaat en ideaal voor korte stadsstop zonder autostress.</li>
+              <li><strong>Kleinschalig hotel of B&B bij oude stad:</strong> sfeervol en handig, alleen kiezen als parking helder geregeld is.</li>
+              <li><strong>Appartement met eigen parking:</strong> praktisch en vaak voordelig; let op bereikbaarheid, trappen en check-in.</li>
+              <li><strong>Hotel iets buiten oude stad met taxi-optie:</strong> goede keuze als parking, rust en comfort belangrijker zijn dan direct in het centrum zitten.</li>
+              <li><strong>Midden in de oude stad zonder parking:</strong> alleen doen als de auto elders veilig geregeld is; minder geschikt voor deze roadtrip.</li>
+            </ul>
+            <p><strong>Must-have:</strong> gegarandeerde parking of duidelijke parkeeroplossing, airco, rustige kamer, goed bed, goede bereikbaarheid met auto en bagage, niet te veel trappen, goede reviews op parking en locatie, makkelijke toegang tot Baščaršija per voet, tram of taxi en duidelijke check-ininformatie.</p>
+            <p><strong>Nice-to-have:</strong> ontbijt inbegrepen, valet parking, lift, uitzicht of balkon, restaurant of café dichtbij, mogelijkheid om auto twee nachten te laten staan, late check-in of flexibele aankomst en wasserijservice.</p>
+            <p><strong>Minder belangrijk:</strong> luxe uitstraling, spa, groot hotelgevoel, direct aan de drukste straat zitten of de auto nodig hebben voor de oude stad.</p>
+            <p><strong>Beste ligging:</strong> Baščaršija / oude stad is het beste voor sfeer maar lastig met parking; net buiten oude stad is vaak de beste balans; Marijin Dvor / centrum is praktischer met taxi/tram; heuvelachtige wijken geven uitzicht maar meer trappen; te ver buiten centrum liever vermijden voor twee nachten.</p>
+            <p><strong>Waar extra op letten:</strong> parking vooraf bevestigen, route naar hotel, trappen naar kamer, straat- of cafégeluid, airco, afstand tot Baščaršija, taxi-mogelijkheden, bagage-uitladen en veiligheid van auto en bagage.</p>
+          </section>
+
+          <section class="block-section">
+            <h3>Activiteiten en kostenindicatie voor dit blok</h3>
+            <ul>
+              <li><strong>Baščaršija / oude stad:</strong> prioriteit hoog. Gratis exclusief eten/drinken. Must-do, vooral ochtend en avond.</li>
+              <li><strong>Latin Bridge:</strong> prioriteit hoog. Gratis. Korte maar belangrijke stop.</li>
+              <li><strong>Bosnische koffie / theehuis / baklava:</strong> prioriteit hoog. Raming voor 2 personen ongeveer €8-20. Onderdeel van de Sarajevo-ervaring.</li>
+              <li><strong>Tunnel of Hope:</strong> prioriteit hoog als inhoudelijke activiteit. Raming voor 2 personen ongeveer 40 KM / circa €20 entree, exclusief vervoer of gids. Cash in Bosnische mark meenemen.</li>
+              <li><strong>Sarajevo Cable Car / Trebević:</strong> prioriteit middel tot hoog bij helder weer. Raming voor 2 personen ongeveer 40 KM / circa €20 retour, afhankelijk van actuele tarieven.</li>
+              <li><strong>War Childhood Museum:</strong> prioriteit middel. Sterk bij interesse in recente geschiedenis, maar emotioneel intens.</li>
+              <li><strong>Gallery 11/07/95:</strong> prioriteit middel. Indrukwekkend, maar niet combineren met te veel andere zware inhoud.</li>
+              <li><strong>Vijećnica:</strong> optioneel tot middel. Mooie lichte cultuurstop, kosten afhankelijk van bezoek binnen/buiten.</li>
+              <li><strong>Food tour / stadswandeling met gids:</strong> optioneel. Grofweg €40-120+ voor 2 personen, afhankelijk van aanbieder.</li>
+              <li><strong>Taxi’s / lokale mobiliteit:</strong> praktisch, ongeveer €15-50 voor het blok. Slim gebruiken, vooral voor Tunnel of Hope of bij warmte.</li>
+              <li><strong>Parkeren:</strong> praktisch, afhankelijk van hotel ongeveer €0-50+. Liever hotel met parking dan elke dag zoeken.</li>
+            </ul>
+            <p><strong>Totaal realistisch activiteitenbudget:</strong> €60-180 exclusief accommodatie en normale maaltijden. Ruimer budget met Tunnel of Hope met tour, cable car, extra museum en food tour: €180-350.</p>
+          </section>
+
+          <section class="block-section">
+            <h3>Zwangerschap-vriendelijke aandachtspunten</h3>
+            <ul>
+              <li><strong>Stadswarmte:</strong> Sarajevo kan in juni warm zijn. Plan wandelen in ochtend en avond, gebruik middag voor lunch, museum, taxi of rust.</li>
+              <li><strong>Wandelen:</strong> oude stad is goed te voet te doen, maar stenen straten, lichte hellingen en drukte kunnen vermoeiend zijn.</li>
+              <li><strong>Taxi’s:</strong> gebruik taxi’s zonder schuldgevoel, vooral voor Tunnel of Hope, hotelterugkeer of warmte.</li>
+              <li><strong>Emotionele belasting:</strong> oorlogsmusea en Tunnel of Hope kunnen zwaar zijn. Kies één hoofdactiviteit en combineer niet te veel zware geschiedenis op één dag.</li>
+              <li><strong>Eten:</strong> regelmatig eten en drinken. Sarajevo is ideaal voor koffiepauzes, lichte lunches en snacks.</li>
+              <li><strong>Trappen/hellingen:</strong> vermijd te veel heuvelachtige routes als basis. Uitzichtpunten alleen als taxi of cable car het makkelijk maken.</li>
+              <li><strong>Auto:</strong> laat de auto bij hotel staan. Rij niet zelf onnodig door oude stad of druk centrum.</li>
+              <li><strong>Rust:</strong> plan op de volle dag een rustblok in de middag of namiddag.</li>
+              <li><strong>Accommodatie:</strong> parking, airco, rustig slapen en korte afstand tot oude stad zijn belangrijker dan luxe.</li>
+              <li><strong>Vertrekdag:</strong> geen extra stadsprogramma op zaterdag dat de rit naar Mostar onder druk zet.</li>
+            </ul>
+          </section>
+
+          <section class="block-section">
+            <h3>Wat wel en niet doen</h3>
+            <div class="drive-grid">
+              <div class="drive-card">
+                <strong>Wel doen</strong>
+                <ul><li>Sarajevo compact maar bewust bezoeken.</li><li>Baščaršija in de avond én ochtend ervaren.</li><li>Eén sterke historische activiteit kiezen.</li><li>Goed eten en koffie serieus nemen.</li><li>Taxi’s gebruiken als dat comfort geeft.</li><li>Hotel met parking kiezen.</li><li>Auto laten staan tijdens het stadsblok.</li><li>Oude stad rustig verkennen.</li><li>Vertrekdag via Konjic en Jablanica gebruiken als scenic route.</li></ul>
+              </div>
+              <div class="drive-card">
+                <strong>Niet doen</strong>
+                <ul><li>Drie zware musea op één dag combineren.</li><li>Tunnel of Hope, Trebević, War Childhood Museum en Gallery 11/07/95 allemaal verplicht maken.</li><li>Eigen auto gebruiken voor stadsverplaatsingen.</li><li>Slapen zonder parkeeroplossing.</li><li>Sarajevo als checklist behandelen.</li><li>Volle stadsplanning op aankomst- of vertrekdag zetten.</li><li>Te laat vertrekken naar Mostar.</li><li>Te veel heuvels/trappen plannen bij warmte.</li><li>De oude stad alleen overdag zien; avond is juist mooi.</li></ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="block-section" id="sarajevo-days">
+            <h3>Dagen binnen dit blok</h3>
+            <details class="day-card travel-day">
+              <summary>Dag 13 · donderdag 25 juni · aankomstdag in Sarajevo</summary>
+              <div class="day-card-body">
+                <p><strong>Let op:</strong> deze dag is een overlapdag. In dit Sarajevo-blok is hij vooral aankomst in de stad, parkeren/check-in regelen en een lichte eerste avond in Baščaršija.</p>
+                <div class="block-facts">
+                  <div class="block-fact"><strong>Start</strong>Tjentište / Sutjeska</div>
+                  <div class="block-fact"><strong>Eindpunt</strong>Sarajevo</div>
+                  <div class="block-fact"><strong>Slapen</strong>Sarajevo</div>
+                  <div class="block-fact"><strong>Route</strong>Tjentište → Valley of Heroes → eventueel Prijevor / uitzichtstop → Sarajevo</div>
+                  <div class="block-fact"><strong>Afstand</strong>ongeveer 110-150 km, afhankelijk van Prijevor-keuze</div>
+                  <div class="block-fact"><strong>Rijtijd</strong>ongeveer 2,5-3 uur netto naar Sarajevo, exclusief stops; langer met Prijevor</div>
+                  <div class="block-fact"><strong>Dagtype</strong>overgang van natuur naar stad / aankomstdag in Sarajevo</div>
+                  <div class="block-fact"><strong>Hoofddoel</strong>ontspannen aankomen, auto parkeren, eerste sfeer meemaken</div>
+                  <div class="block-fact"><strong>Belangrijkste activiteit</strong>avondwandeling door Baščaršija</div>
+                  <div class="block-fact"><strong>Niet doen</strong>na aankomst meteen musea of een vol stadsprogramma plannen</div>
+                </div>
+                <section class="advice"><h4>Hoofdadvies</h4><p>Houd de Sarajevo-kant van deze dag licht. De ochtend heeft al Sutjeska-inhoud en de rit vraagt energie. Na aankomst draait het om praktisch landen: hotel vinden, auto parkeren, inchecken, douchen/rusten en daarna de oude stad in voor sfeer en eten.</p></section>
+                <section class="advice"><h4>Ideale dagindeling</h4><ul><li>Ochtend: Valley of Heroes vanuit Tjentište.</li><li>Late ochtend / middag: rit naar Sarajevo.</li><li>Namiddag: aankomst, parkeren, check-in, rust.</li><li>Vroege avond: korte wandeling door Baščaršija.</li><li>Avond: Bosnisch diner, koffie/thee of baklava.</li></ul></section>
+                <section class="advice"><h4>Baščaršija in de avond</h4><p>Baščaršija is de historische Ottomaanse kern van Sarajevo en de beste plek om de stad meteen te voelen. In de avond is het sfeervol, compact en ideaal voor een eerste wandeling zonder dat het zwaar wordt.</p><ul><li>Sebilj-plein.</li><li>Baščaršija-straatjes.</li><li>Korte wandeling richting Latin Bridge.</li><li>Cevapi of Bosnisch diner.</li><li>Bosnische koffie of thee.</li><li>Niet te laat maken.</li></ul></section>
+                <section class="advice"><h4>Low-energy alternatief</h4><ul><li>Check-in.</li><li>Rust op kamer.</li><li>Taxi naar Baščaršija.</li><li>Korte wandeling van 30-45 minuten.</li><li>Simpel diner.</li><li>Terug naar hotel.</li></ul></section>
+                <section class="advice"><h4>Extra opties bij meer energie</h4><ul><li>Latin Bridge al kort meepakken.</li><li>Vijećnica van buiten bekijken.</li><li>Korte avondwandeling langs de Miljacka.</li><li>Baklava/koffiestop.</li><li>Uitzichtpunt alleen als jullie nog veel energie hebben, maar niet nodig.</li></ul></section>
+                <section class="advice"><h4>Praktische tips</h4><ul><li>Regel hotelparking vooraf.</li><li>Rij niet onnodig met de auto door de oude stad.</li><li>Gebruik taxi’s of lopen.</li><li>Houd de eerste avond sfeergericht.</li><li>Laat zware geschiedenis voor morgen.</li><li>Neem cash mee voor kleine eet- en koffiestops.</li><li>Check of het hotel makkelijk bereikbaar is met bagage.</li><li>Plan de auto na aankomst liefst niet meer te gebruiken tot vertrekdag.</li></ul></section>
+                <section class="advice"><h4>Google Maps en kaartviewer</h4><p>Tjentište → Valley of Heroes → Prijevor → Sarajevo.</p><div class="route-actions"><a href="https://www.google.com/maps/dir/?api=1&origin=Tjenti%C5%A1te%2C%20Bosnia%20and%20Herzegovina&destination=Sarajevo%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Valley%20of%20Heroes%20Memorial%20Park%2C%20Tjenti%C5%A1te%7CPrijevor%2C%20Bosnia%20and%20Herzegovina" target="_blank" rel="noopener">Open in Google Maps</a><button class="secondary" type="button" data-route-view="to-sarajevo">Open in kaart</button></div></section>
+              </div>
+            </details>
+
+            <details class="day-card">
+              <summary>Dag 14 · vrijdag 26 juni · volle dag Sarajevo</summary>
+              <div class="day-card-body">
+                <div class="block-facts">
+                  <div class="block-fact"><strong>Routebasis</strong>Sarajevo te voet / taxi / tram; eventueel taxi naar Tunnel of Hope of cable car naar Trebević</div>
+                  <div class="block-fact"><strong>Afstand</strong>lokaal, afhankelijk van keuzes</div>
+                  <div class="block-fact"><strong>Rijtijd</strong>liever geen eigen auto gebruiken; taxi of openbaar vervoer is praktischer</div>
+                  <div class="block-fact"><strong>Slapen</strong>Sarajevo</div>
+                  <div class="block-fact"><strong>Dagtype</strong>cultuur, geschiedenis, eten, oude stad, uitzicht</div>
+                  <div class="block-fact"><strong>Hoofdactiviteit</strong>oude stad plus één grotere inhoudelijke activiteit</div>
+                  <div class="block-fact"><strong>Beste dagritme</strong>ochtend oude stad, middag inhoudelijke activiteit of rust, avond sfeer/eten</div>
+                  <div class="block-fact"><strong>Belangrijkste valkuil</strong>te veel musea en zware geschiedenis combineren</div>
+                </div>
+                <section class="advice"><h4>Hoofdadvies</h4><p>Houd de dag compact en sterk. Doe de oude stad goed, kies één grote inhoudelijke activiteit en laat ruimte voor koffie, lunch en sfeer. Sarajevo is geen stad om in hoog tempo af te werken.</p></section>
+                <section class="advice"><h4>Ideale dagindeling</h4><ul><li>Ochtend: Baščaršija, Sebilj, Gazi Husrev-beg Mosque, oude straatjes.</li><li>Late ochtend: Latin Bridge en wandeling langs de Miljacka.</li><li>Lunch: Bosnisch eten of rustig café.</li><li>Middag: keuze tussen Tunnel of Hope, Trebević / cable car of museum.</li><li>Namiddag: rust of koffie.</li><li>Avond: diner en avondwandeling.</li></ul></section>
+                <section class="advice"><h4>Basisprogramma</h4><ol><li>Baščaršija.</li><li>Sebilj.</li><li>Gazi Husrev-beg Mosque / omgeving.</li><li>Latin Bridge.</li><li>Vijećnica van buiten of kort van binnen.</li><li>Lunch / koffie.</li><li>Keuzeactiviteit: Tunnel of Hope of Trebević.</li><li>Avond in oude stad.</li></ol></section>
+                <section class="advice"><h4>Hoofdactiviteiten om uit te kiezen</h4><ul><li><strong>Baščaršija:</strong> oude stad, sfeer, eten en koffie. Hart van Sarajevo. Beste in ochtend en avond; niet haasten, vooral dwalen en pauzeren.</li><li><strong>Latin Bridge:</strong> historische plek, compacte maar belangrijke stop, lage fysieke belasting en goed te combineren met oude stad.</li><li><strong>Tunnel of Hope:</strong> moderne oorlogsgeschiedenis, sterke inhoudelijke activiteit. Neem taxi of tour; ongeveer 20 KM per volwassene entree, cash in Bosnische mark. Meestal 45-60 minuten museumbezoek, langer met vervoer of tour. Indrukwekkend en emotioneel zwaarder.</li><li><strong>Sarajevo Cable Car / Trebević:</strong> uitzicht en lichte escape uit de stad. Beste bij helder weer, lage tot matige belasting, vaak rond 20 KM retour per persoon genoemd. Boven eventueel korte wandeling richting bobsleigh track, alleen als het goed voelt.</li><li><strong>War Childhood Museum:</strong> persoonlijke verhalen, sterk bij hitte of regen, lage fysieke belasting maar emotioneel intens.</li><li><strong>Gallery 11/07/95:</strong> fotografie en Srebrenica-herdenking, sterke inhoudelijke plek, emotioneel zwaarder; niet combineren met Tunnel of Hope én War Childhood Museum op dezelfde dag.</li><li><strong>Vijećnica:</strong> architectuur en cultuur, mooi gebouw, compact en centraal, goede lichte cultuurstop.</li></ul></section>
+                <section class="advice"><h4>Voorkeurskeuzes</h4><ul><li><strong>Optie A, meest gebalanceerd:</strong> oude stad + Latin Bridge + Tunnel of Hope + rustige avond.</li><li><strong>Optie B, zachter / minder emotioneel zwaar:</strong> oude stad + Latin Bridge + Sarajevo Cable Car / Trebević + diner.</li><li><strong>Optie C, slecht weer:</strong> oude stad + Vijećnica + museum + koffiehuizen + diner.</li></ul></section>
+                <section class="advice"><h4>Low-energy alternatief</h4><ul><li>Rustig ontbijt.</li><li>Baščaršija en Sebilj.</li><li>Koffie/thee.</li><li>Latin Bridge.</li><li>Lange lunch.</li><li>Vijećnica of klein museum.</li><li>Hotelrust.</li><li>Diner dichtbij.</li></ul></section>
+                <section class="advice"><h4>Extra opties bij meer energie</h4><ul><li>Sarajevo Cable Car naar Trebević.</li><li>Korte wandeling bij bobsleigh track.</li><li>Yellow Fortress voor zonsondergang.</li><li>Food tour.</li><li>Extra museum.</li><li>Avondwandeling langs de Miljacka.</li><li>Korte begeleide stadswandeling.</li></ul></section>
+                <section class="advice"><h4>Praktische tips</h4><ul><li>Gebruik taxi’s slim; vermijd eigen auto in de stad.</li><li>Plan één grote inhoudelijke activiteit, niet drie.</li><li>Neem cash mee.</li><li>Bij Tunnel of Hope: check openingstijden en neem Bosnische mark mee.</li><li>Bij cable car: alleen doen bij redelijk helder zicht.</li><li>Draag comfortabele schoenen.</li><li>Plan koffiepauzes in.</li><li>Houd rekening met warmte in de middag.</li><li>Laat de avond vooral om eten en sfeer draaien.</li><li>Niet te laat maken, want morgen rijden jullie naar Mostar.</li></ul></section>
+                <section class="advice"><h4>Google Maps en kaartviewer</h4><p>Stadsbasis, Tunnel of Hope-variant en Trebević-variant.</p><div class="route-actions"><a href="https://www.google.com/maps/dir/?api=1&origin=Ba%C5%A1%C4%8Dar%C5%A1ija%2C%20Sarajevo&destination=Ba%C5%A1%C4%8Dar%C5%A1ija%2C%20Sarajevo&travelmode=walking&waypoints=Sebilj%2C%20Sarajevo%7CLatin%20Bridge%2C%20Sarajevo%7CVije%C4%87nica%2C%20Sarajevo" target="_blank" rel="noopener">Google Maps stadsbasis</a><button class="secondary" type="button" data-route-view="sarajevo-city-walk">Stadsbasis in kaart</button><a class="secondary" href="https://www.google.com/maps/dir/?api=1&origin=Sarajevo%2C%20Bosnia%20and%20Herzegovina&destination=Sarajevo%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Ba%C5%A1%C4%8Dar%C5%A1ija%2C%20Sarajevo%7CLatin%20Bridge%2C%20Sarajevo%7CTunnel%20of%20Hope%2C%20Sarajevo" target="_blank" rel="noopener">Google Maps Tunnel</a><button class="secondary" type="button" data-route-view="sarajevo-tunnel">Tunnel in kaart</button><a class="secondary" href="https://www.google.com/maps/dir/?api=1&origin=Ba%C5%A1%C4%8Dar%C5%A1ija%2C%20Sarajevo&destination=Ba%C5%A1%C4%8Dar%C5%A1ija%2C%20Sarajevo&travelmode=walking&waypoints=Latin%20Bridge%2C%20Sarajevo%7CSarajevo%20Cable%20Car" target="_blank" rel="noopener">Google Maps Trebević</a><button class="secondary" type="button" data-route-view="sarajevo-trebevic">Trebević in kaart</button></div></section>
+              </div>
+            </details>
+
+            <details class="day-card travel-day">
+              <summary>Dag 15 · zaterdag 27 juni · vertrekdag naar Mostar</summary>
+              <div class="day-card-body">
+                <p><strong>Let op:</strong> deze dag is een overlapdag. In het Sarajevo-blok is hij vooral rustige check-out, mooie rit door de Neretva-vallei en geen extra zwaar stadsprogramma meer.</p>
+                <div class="block-facts">
+                  <div class="block-fact"><strong>Start</strong>Sarajevo</div>
+                  <div class="block-fact"><strong>Eindpunt</strong>Mostar</div>
+                  <div class="block-fact"><strong>Slapen</strong>Mostar</div>
+                  <div class="block-fact"><strong>Route</strong>Sarajevo → Konjic → Jablanica → Mostar</div>
+                  <div class="block-fact"><strong>Afstand</strong>ongeveer 125-145 km</div>
+                  <div class="block-fact"><strong>Rijtijd</strong>ongeveer 2,5-3 uur met stops, afhankelijk van verkeer en pauzes</div>
+                  <div class="block-fact"><strong>Dagtype</strong>scenic transferdag, rivier, vallei, geschiedenis, aankomst Mostar</div>
+                  <div class="block-fact"><strong>Hoofddoel</strong>ontspannen van Sarajevo naar Mostar rijden via de Neretva-vallei</div>
+                  <div class="block-fact"><strong>Belangrijkste stops</strong>Konjic en eventueel Jablanica</div>
+                  <div class="block-fact"><strong>Niet doen</strong>nog een druk Sarajevo-ochtendprogramma vóór vertrek</div>
+                </div>
+                <section class="advice"><h4>Hoofdadvies</h4><p>Gebruik deze dag als mooie overgang van stad naar Herzegovina. De route naar Mostar is geen saaie transfer: Konjic, de Neretva-vallei en Jablanica geven genoeg inhoud. Vertrek niet te laat, zodat jullie Mostar nog in de namiddag of avond kunnen ervaren.</p></section>
+                <section class="advice"><h4>Ideale dagindeling</h4><ul><li>Ochtend: ontbijt en check-out in Sarajevo.</li><li>Late ochtend: rit naar Konjic.</li><li>Late ochtend / middag: korte stop Konjic.</li><li>Middag: Jablanica of lunch langs de Neretva.</li><li>Namiddag: aankomst Mostar, check-in.</li><li>Avond: eerste wandeling naar Stari Most bij mooi licht.</li></ul></section>
+                <section class="advice"><h4>Hoofdactiviteiten onderweg</h4><ul><li><strong>Konjic:</strong> rivierstadje, historische brug en koffiestop. Fijne onderbreking op de route met lage fysieke belasting; korte stop is genoeg.</li><li><strong>Neretva-vallei:</strong> scenic route en een van de mooiere verplaatsingsroutes van Bosnië. Geniet van de rit, niet te veel extra plannen.</li><li><strong>Jablanica:</strong> historische stop en lunchplek. Past goed als tweede pauze, alleen doen als timing goed is.</li></ul></section>
+                <section class="advice"><h4>Low-energy alternatief</h4><ul><li>Rustig check-out.</li><li>Directe rit naar Mostar met één koffiestop.</li><li>Check-in en hotelrust.</li><li>Mostar pas in de avond kort bekijken.</li></ul></section>
+                <section class="advice"><h4>Extra opties bij meer energie</h4><ul><li>Meer tijd in Konjic.</li><li>Lunch aan de Neretva.</li><li>Korte stop in Jablanica.</li><li>Extra viewpoint langs de route.</li><li>Langere avondwandeling in Mostar.</li></ul></section>
+                <section class="advice"><h4>Praktische tips</h4><ul><li>Vertrek niet te laat uit Sarajevo.</li><li>Check verkeersdrukte bij vertrek uit de stad.</li><li>Houd auto en bagage veilig tijdens stops.</li><li>Mostar kan warm zijn; aankomst in de late middag is fijner dan midden op de dag.</li><li>Kies in Mostar hotel met parking.</li><li>Laat de eerste Mostar-avond sfeergericht zijn.</li></ul></section>
+                <section class="advice"><h4>Google Maps en kaartviewer</h4><p>Sarajevo → Konjic → Jablanica → Mostar.</p><div class="route-actions"><a href="https://www.google.com/maps/dir/?api=1&origin=Sarajevo%2C%20Bosnia%20and%20Herzegovina&destination=Mostar%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Konjic%2C%20Bosnia%20and%20Herzegovina%7CJablanica%2C%20Bosnia%20and%20Herzegovina" target="_blank" rel="noopener">Open in Google Maps</a><button class="secondary" type="button" data-route-view="to-mostar">Open in kaart</button></div></section>
+              </div>
+            </details>
+          </section>
+
+          <section class="block-section">
+            <h3>Google Maps-links voor dit blok</h3>
+            <div class="route-actions">
+              <a href="https://www.google.com/maps/dir/?api=1&origin=Tjenti%C5%A1te%2C%20Bosnia%20and%20Herzegovina&destination=Sarajevo%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Valley%20of%20Heroes%20Memorial%20Park%2C%20Tjenti%C5%A1te%7CPrijevor%2C%20Bosnia%20and%20Herzegovina" target="_blank" rel="noopener">Dag 13 aankomstrit</a>
+              <button class="secondary" type="button" data-route-view="to-sarajevo">Dag 13 in kaart</button>
+              <a class="secondary" href="https://www.google.com/maps/dir/?api=1&origin=Ba%C5%A1%C4%8Dar%C5%A1ija%2C%20Sarajevo&destination=Ba%C5%A1%C4%8Dar%C5%A1ija%2C%20Sarajevo&travelmode=walking&waypoints=Sebilj%2C%20Sarajevo%7CLatin%20Bridge%2C%20Sarajevo%7CVije%C4%87nica%2C%20Sarajevo" target="_blank" rel="noopener">Dag 14 stadsbasis</a>
+              <button class="secondary" type="button" data-route-view="sarajevo-city-walk">Stadsbasis in kaart</button>
+              <a class="secondary" href="https://www.google.com/maps/dir/?api=1&origin=Sarajevo%2C%20Bosnia%20and%20Herzegovina&destination=Sarajevo%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Ba%C5%A1%C4%8Dar%C5%A1ija%2C%20Sarajevo%7CLatin%20Bridge%2C%20Sarajevo%7CTunnel%20of%20Hope%2C%20Sarajevo" target="_blank" rel="noopener">Dag 14 Tunnel</a>
+              <button class="secondary" type="button" data-route-view="sarajevo-tunnel">Tunnel in kaart</button>
+              <a class="secondary" href="https://www.google.com/maps/dir/?api=1&origin=Ba%C5%A1%C4%8Dar%C5%A1ija%2C%20Sarajevo&destination=Ba%C5%A1%C4%8Dar%C5%A1ija%2C%20Sarajevo&travelmode=walking&waypoints=Latin%20Bridge%2C%20Sarajevo%7CSarajevo%20Cable%20Car" target="_blank" rel="noopener">Dag 14 Trebević</a>
+              <button class="secondary" type="button" data-route-view="sarajevo-trebevic">Trebević in kaart</button>
+              <a class="secondary" href="https://www.google.com/maps/dir/?api=1&origin=Sarajevo%2C%20Bosnia%20and%20Herzegovina&destination=Mostar%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Konjic%2C%20Bosnia%20and%20Herzegovina%7CJablanica%2C%20Bosnia%20and%20Herzegovina" target="_blank" rel="noopener">Dag 15 vertrekrit</a>
+              <button class="secondary" type="button" data-route-view="to-mostar">Dag 15 in kaart</button>
+            </div>
+          </section>
+        </details>
+        <details class="block-card" id="mostar-block">
+          <summary>
+            <div class="block-hero">
+              <h2>Mostar / Herzegovina</h2>
+              <p>27-29 juni · 2 nachten · Stari Most, Blagaj, Počitelj, Neretva en warm zuidelijk Herzegovina.</p>
+            </div>
+          </summary>
+          <div class="block-sticky">
+            <div>
+              <strong>Mostar / Herzegovina</strong>
+              <span>27-29 juni · 2 nachten · compact Herzegovina-blok</span>
+            </div>
+            <div class="sticky-actions">
+              <a href="#mostar-days">Dagen</a>
+              <button class="collapse-block" type="button">Inklappen</button>
+            </div>
+          </div>
+
+          <section class="block-section">
+            <h3>Samenvatting voor snelle scan</h3>
+            <div class="scan-box">
+              <p><strong>Mostar / Herzegovina · 2 nachten.</strong><br>Check-in: zaterdag 27 juni 2026<br>Check-out: maandag 29 juni 2026</p>
+              <p><strong>Aankomstrit:</strong> Sarajevo → Konjic → Jablanica → Mostar · ongeveer 125-145 km · 2,5-3 uur met stops, afhankelijk van verkeer en pauzes.</p>
+              <p><strong>Vertrekrit:</strong> Mostar → Radimlja / Stolac-optie → Trebinje · ongeveer 115-140 km, afhankelijk van exacte route en stops · 2-3 uur met stops.</p>
+              <p><strong>Rol in de reis:</strong> Mostar / Herzegovina is het warme, zuidelijke cultuur- en landschapsblok. Na Sarajevo wordt de sfeer mediterraner, droger en lichter: oude stenen steden, de Neretva, Stari Most, Blagaj, Počitelj, watervallen, terrasjes en Herzegovina-eten.</p>
+              <p><strong>Hoofdadvies:</strong> gebruik Mostar als basis voor één klassieke Herzegovina-dag. Doe Mostar zelf vroeg of laat, niet midden op de heetste uren. Kies op zondag Blagaj en Počitelj als kern. Kravica is optioneel. Maandag kun je via Radimlja of Stolac naar Trebinje rijden.</p>
+              <p><strong>Must-do:</strong> Mostar old town, Stari Most bij avondlicht of vroeg in de ochtend, Blagaj Tekke, Počitelj, Neretva-vallei op de aankomstrit en een rustige avond in Mostar.</p>
+              <p><strong>Optioneel:</strong> Kravica Waterfall, Radimlja stećci, Stolac, Koski Mehmed Pasha Mosque-uitzicht, koffie/lunch aan de Neretva, wijnhuis in Herzegovina als het praktisch past en extra wandeling buiten de drukste oude-stad-zone.</p>
+              <p><strong>Low-energy:</strong> Mostar vroeg of laat, Blagaj als korte ochtendstop, lunch/rust, Počitelj alleen als het niet te warm is, Kravica overslaan en hotelrust / airco / zwembad indien beschikbaar.</p>
+              <p><strong>Niet doen:</strong> Blagaj, Počitelj, Kravica, Stolac én uitgebreide Mostar-dag allemaal op zondag proppen; Mostar old town midden op de dag als hoofdactiviteit plannen; Kravica verplicht maken; boeken zonder airco of parking; maandag te veel extra kilometers toevoegen.</p>
+              <p><strong>Accommodatie:</strong> kies vooral op airco, parking en ligging. Ideaal is een kleinschalig hotel/B&B met eigen parking op loopafstand van de oude stad, maar net buiten de drukste zone. Zwembad, tuin of terras is extra waardevol vanwege de warmte.</p>
+            </div>
+          </section>
+
+          <section class="block-section">
+            <h3>Blokinformatie</h3>
+            <div class="block-facts">
+              <div class="block-fact"><strong>Bloknaam</strong>Mostar / Herzegovina</div>
+              <div class="block-fact"><strong>Check-in</strong>zaterdag 27 juni 2026</div>
+              <div class="block-fact"><strong>Check-out</strong>maandag 29 juni 2026</div>
+              <div class="block-fact"><strong>Aantal nachten</strong>2</div>
+              <div class="block-fact"><strong>Basisplek</strong>Mostar, liefst op loopafstand van de oude stad maar met makkelijke parking</div>
+              <div class="block-fact"><strong>Tempo</strong>gemiddeld, met nadruk op hittemanagement</div>
+              <div class="block-fact"><strong>Karakter</strong>UNESCO-sfeer, oude stenen stad, Neretva, bruggen, Ottomaanse invloeden, zuidelijke warmte, Blagaj, Počitelj, watervallen, cafés en Herzegovina-landschap</div>
+              <div class="block-fact"><strong>Zwangerschap</strong>goed geschikt als hitte serieus wordt genomen</div>
+            </div>
+            <p><strong>Rol in de reis:</strong> dit blok vormt de overgang van Sarajevo naar het zuidelijkere Herzegovina en uiteindelijk Trebinje. Mostar is de bekendste stad van Herzegovina en de logische basis voor Blagaj, Počitelj en Kravica. In de oorspronkelijke langere route was hier meer ruimte voor slow travel en wijn, maar in de dinsdagvariant moet dit blok compacter worden ingevuld.</p>
+            <p><strong>Tempo:</strong> gemiddeld, maar met nadruk op hittemanagement. De dagen mogen inhoudelijk rijk zijn, maar moeten niet te strak worden. Mostar en Herzegovina kunnen eind juni warm zijn, dus ochtend en avond zijn belangrijker dan de middag.</p>
+            <p><strong>Zwangerschap-vriendelijkheid:</strong> wandelen vroeg of laat, middagrust inbouwen, veel water mee, geen lange wandelingen in volle zon, en Kravica of Počitelj alleen doen als het comfortabel voelt. Kies accommodatie met airco en liefst makkelijke rustmogelijkheden.</p>
+            <p><strong>Waarom dit blok goed past:</strong> Mostar / Herzegovina geeft de reis een andere kleur na Sarajevo. De Neretva-route naar Mostar is landschappelijk mooi, Mostar zelf is sfeervol en historisch, en de dagtrips naar Blagaj en Počitelj zijn compact maar zeer karaktervol. De ligging richting Trebinje maakt het ook logisch als voorlaatste reisfase.</p>
+            <ul>
+              <li>Sterkste Herzegovina-blok van de route.</li>
+              <li>Mostar is iconisch en sfeervol, vooral vroeg of laat.</li>
+              <li>Blagaj en Počitelj liggen relatief dicht bij Mostar.</li>
+              <li>Kravica is een mooie natuur-/waterstop als warmte, energie en drukte goed voelen.</li>
+              <li>De route vanuit Sarajevo via Konjic en Jablanica is al een highlight.</li>
+              <li>De vertrekroute naar Trebinje kan worden verrijkt met Radimlja of Stolac.</li>
+              <li>Veel beleving in weinig dagen, mits goed gedoseerd.</li>
+            </ul>
+            <p><strong>Kernadvies:</strong> maak zondag de klassieke Herzegovina-dag met Blagaj en Počitelj als kern. Kravica alleen toevoegen als bonus. Gebruik zaterdagavond en maandagochtend voor Mostar zelf. Zo voorkom je dat zondag te vol wordt en houd je de warmte beter beheersbaar.</p>
+            <p><strong>Belangrijkste valkuil:</strong> te veel in één volle dag willen doen. Bij 2 nachten Mostar is het verleidelijk om alle Herzegovina-stops te combineren, maar dat maakt de dag te warm en te druk. Prioriteiten: Mostar, Blagaj, Počitelj. Kravica, Stolac en Radimlja zijn extra’s.</p>
+          </section>
+
+          <section class="block-section">
+            <h3>Accommodatieadvies Mostar / Herzegovina</h3>
+            <ul>
+              <li><strong>Kleinschalig hotel of B&B met parking op loopafstand van oude stad:</strong> beste keuze voor sfeer en gemak als de auto veilig staat en Stari Most te voet bereikbaar is.</li>
+              <li><strong>Hotel net buiten de drukste oude stad:</strong> vaak beste balans tussen rust, parking en bereikbaarheid. Minder romantisch, maar praktischer bij hitte en bagage.</li>
+              <li><strong>Appartement met eigen parking:</strong> praktisch en vaak voordelig; let op airco, trappen en check-in.</li>
+              <li><strong>Hotel met zwembad of tuin:</strong> zeer waardevol eind juni, vooral voor middagrust na Blagaj/Počitelj/Kravica.</li>
+              <li><strong>Midden in oude stad zonder parking:</strong> alleen kiezen als parkeren elders goed geregeld is; minder ideaal door bagage, stenen straatjes en hitte.</li>
+            </ul>
+            <p><strong>Must-have:</strong> airco, gegarandeerde parking of duidelijke parkeeroplossing, goed bed, rustige kamer, goede bereikbaarheid met bagage, loopafstand naar oude stad of korte taxi, goede reviews op parkeren/hygiëne/airco, niet te veel trappen en mogelijkheid tot rust in de middag.</p>
+            <p><strong>Nice-to-have:</strong> zwembad, tuin of terras, balkon, ontbijt inbegrepen, koelkastje, restaurant of cafés dichtbij, schaduwrijke buitenruimte, late check-in / flexibele aankomst en wasserijservice.</p>
+            <p><strong>Minder belangrijk:</strong> luxe uitstraling, midden in het toeristische hart zitten, grote hotelketen, wellness of uitzicht als dat ten koste gaat van parking/comfort.</p>
+            <p><strong>Beste ligging:</strong> net buiten oude stad is de beste balans; oude stad-rand is goed als parking geregeld is; volledig midden in oude stad is sfeervol maar logistiek lastiger; buiten centrum alleen als zwembad/parking/comfort veel beter zijn; richting Blagaj is minder logisch als basis voor Mostar zelf.</p>
+            <p><strong>Waar extra op letten:</strong> parking echt bij de accommodatie, loopafstand naar Stari Most, trappen of steile straatjes, airco, schaduw/rustplek voor middag, veiligheid auto, makkelijk uitchecken richting Trebinje en vroeg ontbijt als jullie Blagaj vroeg willen doen.</p>
+          </section>
+
+          <section class="block-section">
+            <h3>Activiteiten en kostenindicatie voor dit blok</h3>
+            <ul>
+              <li><strong>Mostar old town / Stari Most:</strong> prioriteit hoog. Gratis exclusief eten/drinken. Must-do, vooral vroeg of laat.</li>
+              <li><strong>Blagaj Tekke:</strong> prioriteit hoog. Raming voor 2 personen ongeveer €8-15, afhankelijk van actuele entree. Must-do, vroeg op de dag.</li>
+              <li><strong>Počitelj:</strong> prioriteit hoog. Meestal gratis / kleine kosten. Must-do, maar klimmen beperken bij warmte.</li>
+              <li><strong>Kravica Waterfall:</strong> prioriteit middel tot hoog als energie en weer goed zijn. Raming voor 2 personen ongeveer €20-25. Mooi, maar niet verplicht.</li>
+              <li><strong>Radimlja stećci:</strong> optioneel tot middel. Raming voor 2 personen ongeveer €4-10. Goede korte stop richting Trebinje.</li>
+              <li><strong>Stolac:</strong> optioneel. Vooral parkeren/koffie/lunch. Alleen als jullie rustig genoeg uit Mostar vertrekken.</li>
+              <li><strong>Koski Mehmed Pasha Mosque / uitzicht:</strong> optioneel. Mooi uitzicht op Stari Most, maar geen must.</li>
+              <li><strong>Wijnproeverij Herzegovina:</strong> optioneel. Ongeveer €30-80+ voor 2 personen. Alleen als het praktisch past; geen vaste activiteit in deze ingekorte route.</li>
+              <li><strong>Parkeren / lokale kosten:</strong> praktisch, ongeveer €15-50 voor het blok, afhankelijk van hotelparking en dagstops.</li>
+              <li><strong>Koffie / lunch / snacks:</strong> praktisch, ongeveer €40-100 voor het blok. Houd rekening met warme dagen en extra drinkpauzes.</li>
+            </ul>
+            <p><strong>Totaal realistisch activiteitenbudget:</strong> €60-180 exclusief accommodatie en normale maaltijden. Ruimer budget met Kravica, meerdere entrees, uitzichtpunten en wijnproeverij: €180-300.</p>
+          </section>
+
+          <section class="block-section">
+            <h3>Zwangerschap-vriendelijke aandachtspunten</h3>
+            <ul>
+              <li><strong>Warmte:</strong> waarschijnlijk een van de warmste blokken. Plan buitenactiviteiten vroeg of laat en houd middaguren rustig.</li>
+              <li><strong>Mostar:</strong> oude stad heeft gladde stenen, trappen en drukte. Goede schoenen en rustig tempo zijn belangrijk.</li>
+              <li><strong>Blagaj:</strong> goed geschikt als vroege activiteit. Let op drukte en warmte later op de dag.</li>
+              <li><strong>Počitelj:</strong> mooi, maar stenen paden en hellingen kunnen vermoeiend zijn. Niet per se naar elk uitzichtpunt klimmen.</li>
+              <li><strong>Kravica:</strong> alleen doen als het comfortabel voelt. Let op drukte, paden, warmte en toegang tot water/schaduw.</li>
+              <li><strong>Hydratatie:</strong> altijd water mee en extra drinken in dit blok.</li>
+              <li><strong>Accommodatie:</strong> airco is essentieel. Zwembad of tuin is extra waardevol.</li>
+              <li><strong>Middagrust:</strong> zondagmiddag bewust rust of een luchtige waterstop, niet nog een extra historisch dorp.</li>
+              <li><strong>Autoritten:</strong> korte ritten, maar warmte en parkeren kosten energie. Houd routes eenvoudig.</li>
+              <li><strong>Flexibiliteit:</strong> Kravica en Stolac zijn extra’s, geen verplichtingen.</li>
+            </ul>
+          </section>
+
+          <section class="block-section">
+            <h3>Wat wel en niet doen</h3>
+            <div class="drive-grid">
+              <div class="drive-card">
+                <strong>Wel doen</strong>
+                <ul><li>Mostar vroeg of laat bekijken.</li><li>Blagaj als ochtendstop plannen.</li><li>Počitelj toevoegen als het niet te warm is.</li><li>Kravica optioneel houden.</li><li>Hotel met airco en parking boeken.</li><li>Middagrust serieus nemen.</li><li>Maandag op tijd naar Trebinje vertrekken.</li><li>Radimlja of Stolac als korte stop overwegen.</li><li>Goede schoenen dragen.</li><li>Veel water meenemen.</li></ul>
+              </div>
+              <div class="drive-card">
+                <strong>Niet doen</strong>
+                <ul><li>Alles in Herzegovina op één dag willen zien.</li><li>Mostar midden op de dag als hoofdprogramma plannen.</li><li>Počitelj uitgebreid beklimmen in volle hitte.</li><li>Kravica verplicht maken als energie laag is.</li><li>Zonder airco boeken.</li><li>Slapen zonder duidelijke parking.</li><li>Zondag te laat maken.</li><li>Maandag te veel stops plannen onderweg naar Trebinje.</li><li>De extra slow-travel/wijndag forceren in de 2-nachtenvariant.</li></ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="block-section" id="mostar-days">
+            <h3>Dagen binnen dit blok</h3>
+            <details class="day-card travel-day">
+              <summary>Dag 15 · zaterdag 27 juni · aankomstdag naar Mostar</summary>
+              <div class="day-card-body">
+                <p><strong>Let op:</strong> deze dag is een overlapdag. In dit blok is hij vooral de mooie aankomstrit door de Neretva-vallei en eerste avond in Mostar.</p>
+                <div class="block-facts">
+                  <div class="block-fact"><strong>Start</strong>Sarajevo</div><div class="block-fact"><strong>Eindpunt</strong>Mostar</div><div class="block-fact"><strong>Slapen</strong>Mostar</div>
+                  <div class="block-fact"><strong>Route</strong>Sarajevo → Konjic → Jablanica → Mostar</div><div class="block-fact"><strong>Afstand</strong>ongeveer 125-145 km</div><div class="block-fact"><strong>Rijtijd</strong>ongeveer 2,5-3 uur met stops</div>
+                  <div class="block-fact"><strong>Dagtype</strong>scenic transferdag, rivier, vallei, geschiedenis, aankomst Mostar</div><div class="block-fact"><strong>Hoofddoel</strong>ontspannen naar Mostar via de Neretva-vallei</div><div class="block-fact"><strong>Belangrijkste stops</strong>Konjic en eventueel Jablanica</div><div class="block-fact"><strong>Niet doen</strong>druk Sarajevo-ochtendprogramma vóór vertrek</div>
+                </div>
+                <section class="advice"><h4>Hoofdadvies</h4><p>Gebruik deze dag als mooie overgang van stad naar Herzegovina. Konjic, de Neretva-vallei en Jablanica geven genoeg inhoud. Vertrek niet te laat, zodat jullie Mostar nog in namiddag of avond kunnen ervaren.</p></section>
+                <section class="advice"><h4>Ideale dagindeling</h4><ul><li>Ochtend: ontbijt en check-out in Sarajevo.</li><li>Late ochtend: rit naar Konjic.</li><li>Late ochtend / middag: korte stop in Konjic.</li><li>Middag: Jablanica of lunch langs de Neretva.</li><li>Namiddag: aankomst Mostar, check-in en rust.</li><li>Avond: eerste wandeling naar Stari Most bij mooi licht.</li></ul></section>
+                <section class="advice"><h4>Hoofdactiviteiten onderweg</h4><ul><li><strong>Konjic:</strong> rivierstadje, historische brug, koffiestop. Lage belasting, korte stop is genoeg, beste late ochtend.</li><li><strong>Neretva-vallei:</strong> scenic route en een van de mooiste overgangsroutes van Bosnië. Laat de rit onderdeel van de dag zijn.</li><li><strong>Jablanica:</strong> historische stop / lunchplek, logische tweede pauze als timing goed is.</li><li><strong>Mostar avond:</strong> oude stad, brug en sfeer. Mostar is fijner als licht zachter is en hitte minder wordt; houd het sfeergericht.</li></ul></section>
+                <section class="advice"><h4>Low-energy alternatief</h4><ul><li>Rustig check-out in Sarajevo.</li><li>Directe rit naar Mostar met één koffiestop.</li><li>Check-in en hotelrust.</li><li>Mostar pas in de avond kort bekijken.</li><li>Diner dichtbij accommodatie of oude stad.</li></ul></section>
+                <section class="advice"><h4>Extra opties bij meer energie</h4><ul><li>Meer tijd in Konjic.</li><li>Lunch aan de Neretva.</li><li>Korte stop in Jablanica.</li><li>Extra viewpoint langs de route.</li><li>Langere avondwandeling in Mostar.</li><li>Eerste korte foto-/koffiestop bij Stari Most.</li></ul></section>
+                <section class="advice"><h4>Praktische tips</h4><ul><li>Vertrek niet te laat uit Sarajevo.</li><li>Check verkeersdrukte bij vertrek.</li><li>Houd auto en bagage veilig tijdens stops.</li><li>Mostar kan warm zijn; late middag is fijner dan midden op de dag.</li><li>Kies hotel met parking.</li><li>Neem water mee.</li><li>Parkeer eerst bij hotel en ga daarna te voet de oude stad in.</li></ul></section>
+                <section class="advice"><h4>Google Maps en kaartviewer</h4><p>Sarajevo → Konjic → Jablanica → Mostar.</p><div class="route-actions"><a href="https://www.google.com/maps/dir/?api=1&origin=Sarajevo%2C%20Bosnia%20and%20Herzegovina&destination=Mostar%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Konjic%2C%20Bosnia%20and%20Herzegovina%7CJablanica%2C%20Bosnia%20and%20Herzegovina" target="_blank" rel="noopener">Open in Google Maps</a><button class="secondary" type="button" data-route-view="to-mostar">Open in kaart</button></div></section>
+              </div>
+            </details>
+
+            <details class="day-card">
+              <summary>Dag 16 · zondag 28 juni · klassieke Herzegovina-dag</summary>
+              <div class="day-card-body">
+                <div class="block-facts">
+                  <div class="block-fact"><strong>Route</strong>Mostar → Blagaj → Počitelj → eventueel Kravica → Mostar</div><div class="block-fact"><strong>Afstand</strong>ongeveer 90-145 km</div><div class="block-fact"><strong>Rijtijd</strong>korte tot middelmatige lokale ritten</div><div class="block-fact"><strong>Slapen</strong>Mostar</div>
+                  <div class="block-fact"><strong>Dagtype</strong>Herzegovina, oude dorpen, rivierbron, waterval, cultuur en natuur</div><div class="block-fact"><strong>Hoofdactiviteit</strong>Blagaj + Počitelj</div><div class="block-fact"><strong>Optioneel</strong>Kravica Waterfall</div><div class="block-fact"><strong>Beste ritme</strong>vroeg starten, middagpauze, Kravica alleen als het goed voelt</div><div class="block-fact"><strong>Valkuil</strong>alle stops in volle hitte willen doen</div>
+                </div>
+                <section class="advice"><h4>Hoofdadvies</h4><p>Maak Blagaj en Počitelj de kern van de dag. Voeg Kravica alleen toe als het niet te warm is, jullie goed in de energie zitten en het qua drukte prettig voelt. De dag hoeft niet maximaal te zijn om geslaagd te zijn.</p></section>
+                <section class="advice"><h4>Ideale dagindeling</h4><ul><li>Ochtend vroeg: vertrek naar Blagaj.</li><li>Ochtend: Blagaj Tekke en rivierbron.</li><li>Late ochtend: Počitelj.</li><li>Middag: lunch en rust.</li><li>Namiddag: Kravica optioneel, of terug naar Mostar voor rust.</li><li>Avond: Mostar bij avondlicht, diner.</li></ul></section>
+                <section class="advice"><h4>Hoofdactiviteiten</h4><ul><li><strong>Blagaj Tekke:</strong> rivierbron, klooster/tekke, cultuur en natuur. Een van de mooiste toegankelijke stops rond Mostar. Beste vroeg; lage tot matige belasting; must-do en zwangerschap-vriendelijk bij rustig tempo.</li><li><strong>Počitelj:</strong> historisch dorp, stenen straatjes en uitzicht. Zeer karaktervol en fotogeniek. Matige belasting door stenen, hellingen en warmte; niet elk uitzichtpunt hoeft.</li><li><strong>Kravica Waterfall:</strong> waterval, natuur, zwem- en rustplek. Mooi bij warmte maar optioneel; let op drukte, toegang en paden.</li><li><strong>Mostar avond:</strong> oude stad, Stari Most en diner. Gebruik de avond voor sfeer, niet voor lange checklist.</li></ul></section>
+                <section class="advice"><h4>Prioriteitenvolgorde</h4><ol><li>Blagaj.</li><li>Počitelj.</li><li>Mostar avond.</li><li>Kravica alleen als bonus.</li></ol></section>
+                <section class="advice"><h4>Low-energy alternatief</h4><ul><li>Ochtend: Blagaj vroeg.</li><li>Late ochtend: lunch of koffie.</li><li>Middag: hotelrust / airco / zwembad.</li><li>Namiddag: korte wandeling Mostar.</li><li>Avond: diner bij Stari Most.</li><li>Počitelj en Kravica overslaan of één van beide kiezen.</li></ul></section>
+                <section class="advice"><h4>Slecht-weer alternatief</h4><ul><li>Blagaj kan nog steeds mooi zijn.</li><li>Mostar oude stad, cafés en kleine musea.</li><li>Počitelj alleen als het veilig en niet glad voelt.</li><li>Kravica minder interessant bij slecht weer.</li><li>Lange lunch en rustige middag.</li></ul></section>
+                <section class="advice"><h4>Extra opties bij meer energie</h4><ul><li>Alle drie de stops: Blagaj + Počitelj + Kravica.</li><li>Extra wandeling in Počitelj.</li><li>Uitzichtpunt of moskee in Mostar.</li><li>Zwemmen bij Kravica als toegestaan en prettig.</li><li>Wijnstop in Herzegovina als jullie Kravica overslaan.</li><li>Avondwandeling buiten de drukste oude-stad-zone.</li></ul></section>
+                <section class="advice"><h4>Praktische tips</h4><ul><li>Start vroeg.</li><li>Neem veel water mee.</li><li>Draag goede schoenen voor stenen paden.</li><li>Plan de middag niet te zwaar.</li><li>Houd Kravica optioneel.</li><li>Neem zwemspullen/waterschoenen alleen mee als Kravica serieus is.</li><li>Parkeren bij populaire stops kan tijd kosten.</li><li>Gebruik airco/hotelrust bewust.</li><li>Laat zondag niet te laat eindigen, want maandag reizen jullie door naar Trebinje.</li></ul></section>
+                <section class="advice"><h4>Google Maps en kaartviewer</h4><p>Basisroute zonder Kravica en uitgebreide route met Kravica.</p><div class="route-actions"><a href="https://www.google.com/maps/dir/?api=1&origin=Mostar%2C%20Bosnia%20and%20Herzegovina&destination=Mostar%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Blagaj%20Tekke%2C%20Bosnia%20and%20Herzegovina%7CPo%C4%8Ditelj%2C%20Bosnia%20and%20Herzegovina" target="_blank" rel="noopener">Google Maps basis</a><button class="secondary" type="button" data-route-view="mostar-herzegovina-base">Basis in kaart</button><a class="secondary" href="https://www.google.com/maps/dir/?api=1&origin=Mostar%2C%20Bosnia%20and%20Herzegovina&destination=Mostar%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Blagaj%20Tekke%2C%20Bosnia%20and%20Herzegovina%7CPo%C4%8Ditelj%2C%20Bosnia%20and%20Herzegovina%7CKravica%20Waterfall%2C%20Bosnia%20and%20Herzegovina" target="_blank" rel="noopener">Google Maps uitgebreid</a><button class="secondary" type="button" data-route-view="mostar-herzegovina-kravica">Uitgebreid in kaart</button></div></section>
+              </div>
+            </details>
+
+            <details class="day-card travel-day">
+              <summary>Dag 17 · maandag 29 juni · vertrekdag naar Trebinje</summary>
+              <div class="day-card-body">
+                <p><strong>Let op:</strong> deze dag is een overlapdag. In het Mostar-blok is hij vooral rustige laatste ochtend in Mostar en overgang naar Trebinje, met eventueel één korte stop onderweg.</p>
+                <div class="block-facts">
+                  <div class="block-fact"><strong>Start</strong>Mostar</div><div class="block-fact"><strong>Eindpunt</strong>Trebinje</div><div class="block-fact"><strong>Slapen</strong>Trebinje</div><div class="block-fact"><strong>Route</strong>Mostar → Radimlja / Stolac-optie → Trebinje</div><div class="block-fact"><strong>Afstand</strong>ongeveer 115-140 km</div><div class="block-fact"><strong>Rijtijd</strong>ongeveer 2-3 uur met stops</div><div class="block-fact"><strong>Dagtype</strong>overgangsdag, zuidelijk Herzegovina, kleine stad, erfgoed</div><div class="block-fact"><strong>Hoofddoel</strong>rustig uit Mostar vertrekken en op tijd in Trebinje aankomen</div><div class="block-fact"><strong>Optionele stop</strong>Radimlja of Stolac</div><div class="block-fact"><strong>Niet doen</strong>zondag gemiste highlights allemaal inhalen</div>
+                </div>
+                <section class="advice"><h4>Hoofdadvies</h4><p>Gebruik deze dag niet om nog een hele extra Herzegovina-dag te maken. Kies hoogstens één korte stop onderweg, zoals Radimlja of Stolac, en zorg dat jullie op tijd in Trebinje aankomen. Trebinje verdient nog een middag en avond.</p></section>
+                <section class="advice"><h4>Ideale dagindeling</h4><ul><li>Ochtend: vroege of rustige wandeling in Mostar.</li><li>Late ochtend: check-out.</li><li>Middag: korte stop bij Radimlja of Stolac.</li><li>Namiddag: aankomst Trebinje, check-in.</li><li>Avond: oude stad, rivierwandeling en diner in Trebinje.</li></ul></section>
+                <section class="advice"><h4>Opties onderweg</h4><ul><li><strong>Mostar ochtend:</strong> Stari Most is vroeg vaak mooier en rustiger. Korte wandeling, koffie en foto’s; niet te lang maken.</li><li><strong>Radimlja stećci:</strong> middeleeuwse grafstenen / erfgoedgevoel. Lage belasting en goede korte culturele stop.</li><li><strong>Stolac:</strong> kleine stad, rivier en geschiedenis. Alleen doen als jullie echt zin hebben in extra plaats; niet én Stolac uitgebreid én Radimlja uitgebreid én laat in Trebinje aankomen.</li><li><strong>Trebinje aankomst:</strong> rustige zuidelijke stad en finale van Bosnië-blok. Kom liever vroeg aan dan laat.</li></ul></section>
+                <section class="advice"><h4>Low-energy alternatief</h4><ul><li>Rustige ochtend Mostar.</li><li>Directe rit naar Trebinje.</li><li>Check-in en rust.</li><li>Geen Radimlja of Stolac.</li><li>Trebinje in de avond rustig bekijken.</li></ul></section>
+                <section class="advice"><h4>Extra opties bij meer energie</h4><ul><li>Vroege Mostar-fotowandeling.</li><li>Radimlja als korte stop.</li><li>Koffie/lunch in Stolac.</li><li>Korte extra route door zuidelijk Herzegovina.</li><li>In Trebinje nog naar een uitzichtpunt bij zonsondergang.</li></ul></section>
+                <section class="advice"><h4>Praktische tips</h4><ul><li>Laat Mostar niet te laat worden.</li><li>Kies één stop onderweg, niet drie.</li><li>Neem water mee.</li><li>Trebinje is leuker als jullie nog een middag en avond hebben.</li><li>Houd rekening met warmte.</li><li>Check route en wegcondities.</li><li>Laat bagage niet zichtbaar in de auto bij stops.</li><li>Zorg dat accommodatie in Trebinje parking heeft.</li></ul></section>
+                <section class="advice"><h4>Google Maps en kaartviewer</h4><p>Mostar → Radimlja → Stolac → Trebinje.</p><div class="route-actions"><a href="https://www.google.com/maps/dir/?api=1&origin=Mostar%2C%20Bosnia%20and%20Herzegovina&destination=Trebinje%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Radimlja%20Ste%C4%87ak%20Necropolis%2C%20Bosnia%20and%20Herzegovina%7CStolac%2C%20Bosnia%20and%20Herzegovina" target="_blank" rel="noopener">Open in Google Maps</a><button class="secondary" type="button" data-route-view="to-trebinje">Open in kaart</button></div></section>
+              </div>
+            </details>
+          </section>
+
+          <section class="block-section">
+            <h3>Google Maps-links voor dit blok</h3>
+            <div class="route-actions">
+              <a href="https://www.google.com/maps/dir/?api=1&origin=Sarajevo%2C%20Bosnia%20and%20Herzegovina&destination=Mostar%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Konjic%2C%20Bosnia%20and%20Herzegovina%7CJablanica%2C%20Bosnia%20and%20Herzegovina" target="_blank" rel="noopener">Dag 15 aankomstrit</a><button class="secondary" type="button" data-route-view="to-mostar">Dag 15 in kaart</button>
+              <a class="secondary" href="https://www.google.com/maps/dir/?api=1&origin=Mostar%2C%20Bosnia%20and%20Herzegovina&destination=Mostar%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Blagaj%20Tekke%2C%20Bosnia%20and%20Herzegovina%7CPo%C4%8Ditelj%2C%20Bosnia%20and%20Herzegovina" target="_blank" rel="noopener">Dag 16 basisroute</a><button class="secondary" type="button" data-route-view="mostar-herzegovina-base">Basis in kaart</button>
+              <a class="secondary" href="https://www.google.com/maps/dir/?api=1&origin=Mostar%2C%20Bosnia%20and%20Herzegovina&destination=Mostar%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Blagaj%20Tekke%2C%20Bosnia%20and%20Herzegovina%7CPo%C4%8Ditelj%2C%20Bosnia%20and%20Herzegovina%7CKravica%20Waterfall%2C%20Bosnia%20and%20Herzegovina" target="_blank" rel="noopener">Dag 16 uitgebreid</a><button class="secondary" type="button" data-route-view="mostar-herzegovina-kravica">Uitgebreid in kaart</button>
+              <a class="secondary" href="https://www.google.com/maps/dir/?api=1&origin=Mostar%2C%20Bosnia%20and%20Herzegovina&destination=Trebinje%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Radimlja%20Ste%C4%87ak%20Necropolis%2C%20Bosnia%20and%20Herzegovina%7CStolac%2C%20Bosnia%20and%20Herzegovina" target="_blank" rel="noopener">Dag 17 vertrekrit</a><button class="secondary" type="button" data-route-view="to-trebinje">Dag 17 in kaart</button>
+            </div>
+          </section>
+        </details>
+        <details class="block-card" id="trebinje-block">
+          <summary>
+            <div class="block-hero">
+              <h2>Trebinje</h2>
+              <p>29-30 juni · 1 nacht · rustige zuidelijke finale vóór de terugvlucht vanaf Podgorica.</p>
+            </div>
+          </summary>
+          <div class="block-sticky">
+            <div>
+              <strong>Trebinje</strong>
+              <span>29-30 juni · 1 nacht · laatste Bosnische avond</span>
+            </div>
+            <div class="sticky-actions">
+              <a href="#trebinje-days">Dagen</a>
+              <button class="collapse-block" type="button">Inklappen</button>
+            </div>
+          </div>
+
+          <section class="block-section">
+            <h3>Samenvatting voor snelle scan</h3>
+            <div class="scan-box">
+              <p><strong>Trebinje · 1 nacht.</strong><br>Check-in: maandag 29 juni 2026<br>Check-out: dinsdag 30 juni 2026</p>
+              <p><strong>Aankomstrit:</strong> Mostar → Radimlja / Stolac-optie → Trebinje · ongeveer 115-140 km, afhankelijk van route en stops · 2-3 uur met stops.</p>
+              <p><strong>Vertrekrit:</strong> Trebinje → Podgorica Airport · ongeveer 120-145 km, afhankelijk van exacte route · 2-2,5 uur netto, exclusief grenspassage, tanken en auto-inleveren.</p>
+              <p><strong>Rol in de reis:</strong> Trebinje is de rustige finale van de reis. Het maakt de rit vanuit Mostar naar de luchthaven beter behapbaar en voegt een zuidelijke, compacte, mediterrane en minder toeristische Herzegovina-sfeer toe.</p>
+              <p><strong>Hoofdadvies:</strong> gebruik Trebinje als sfeervolle laatste overnachting, niet alleen als praktische stop. Kom maandag op tijd aan, wandel door de oude stad, loop langs de Trebišnjica-rivier, pak terras of diner en eventueel zonsondergang bij Hercegovačka Gračanica. Dinsdag geen groot programma: rustig ontbijten, uitchecken en met ruime marge naar Podgorica Airport.</p>
+              <p><strong>Must-do:</strong> Trebinje old town, wandeling langs de Trebišnjica-rivier, Arslanagić / Perović-brug, terras of diner in de oude stad, Hercegovačka Gračanica bij zonsondergang als energie goed is en een rustige laatste avond.</p>
+              <p><strong>Optioneel:</strong> wijnhuis of wijnbar, Tvrdoš Monastery, kleine markt / lokale winkels, extra rivierwandeling, uitzichtpunt boven de stad, koffie op een plein en korte ochtendwandeling op vertrekdag alleen als er ruim tijd is.</p>
+              <p><strong>Low-energy:</strong> direct naar hotel, rust, korte wandeling door oude stad, diner dichtbij, geen uitzichtpunt en dinsdag direct naar luchthaven na ontbijt.</p>
+              <p><strong>Niet doen:</strong> maandag te veel stops tussen Mostar en Trebinje plannen, Trebinje pas laat bereiken, dinsdag nog een echte excursie plannen, zonder ruime marge naar Podgorica vertrekken, grenspassage onderschatten, laatste avond te vol maken of hotel zonder parking boeken.</p>
+              <p><strong>Accommodatie:</strong> kies hotel, B&B of appartement in of vlak bij de oude stad met parking, airco, goede bereikbaarheid en comfortabele kamer. Gemak, parkeren en ligging zijn belangrijker dan luxe.</p>
+            </div>
+          </section>
+
+          <section class="block-section">
+            <h3>Blokinformatie</h3>
+            <div class="block-facts">
+              <div class="block-fact"><strong>Bloknaam</strong>Trebinje</div>
+              <div class="block-fact"><strong>Check-in</strong>maandag 29 juni 2026</div>
+              <div class="block-fact"><strong>Check-out</strong>dinsdag 30 juni 2026</div>
+              <div class="block-fact"><strong>Aantal nachten</strong>1</div>
+              <div class="block-fact"><strong>Basisplek</strong>Trebinje, liefst in of vlak bij de oude stad of bij de rivier</div>
+              <div class="block-fact"><strong>Tempo</strong>rustig; maandagmiddag/avond voor Trebinje, dinsdag voor terugreis</div>
+              <div class="block-fact"><strong>Karakter</strong>rustige zuidelijke stad, mediterrane sfeer, oude stad, rivier, bruggen, wijnregio, terrassen, kerken/kloosters en minder toeristisch dan Mostar</div>
+              <div class="block-fact"><strong>Zwangerschap</strong>goed geschikt: korte wandelingen, terrassen, rivier en eventueel uitzichtpunt met auto/taxi</div>
+            </div>
+            <p><strong>Rol in de reis:</strong> Trebinje is de laatste overnachting vóór de terugvlucht vanaf Podgorica. Praktisch verkort het de slotdag ten opzichte van rechtstreeks vanuit Mostar naar Podgorica Airport rijden. Inhoudelijk geeft het de reis een rustige, andere Herzegovina-finale met oude stad, rivier en zuidelijke sfeer.</p>
+            <p><strong>Waarom dit blok goed past:</strong> Trebinje voorkomt dat de terugreis vanuit Mostar naar Podgorica Airport te lang en stressvol wordt. Tegelijk is het leuk genoeg om als laatste echte stop te blijven staan. Het voelt zuidelijker, rustiger en minder toeristisch dan Mostar en geeft een mooie afbouw na Sarajevo en Mostar.</p>
+            <ul>
+              <li>Maakt de slotdag beter beheersbaar.</li>
+              <li>Geeft een sfeervolle laatste Bosnische avond.</li>
+              <li>Minder druk dan Mostar.</li>
+              <li>Compact en goed te voet te verkennen.</li>
+              <li>Mooie rivier en bruggen.</li>
+              <li>Wijnregio en goed eten.</li>
+              <li>Praktische ligging richting Podgorica.</li>
+              <li>Goede afbouw vóór de vlucht.</li>
+            </ul>
+            <p><strong>Kernadvies:</strong> kom maandag niet te laat aan. Trebinje werkt het beste als jullie nog een middag en avond hebben. Kies onderweg maximaal één stop, zoals Radimlja of Stolac. In Trebinje: oude stad, rivierwandeling, diner en eventueel zonsondergang bij Hercegovačka Gračanica. Dinsdag geen inhoudelijke dag meer maken, maar ruim op tijd naar Podgorica Airport rijden.</p>
+            <p><strong>Belangrijkste valkuil:</strong> Trebinje behandelen als alleen een slaapplek en daarom te laat aankomen. Dan verlies je de charme van deze stop. De andere valkuil is dinsdag te veel willen doen vóór de vlucht; de slotdag moet ruim en simpel blijven.</p>
+          </section>
+
+          <section class="block-section">
+            <h3>Accommodatieadvies Trebinje</h3>
+            <ul>
+              <li><strong>Hotel of B&B in of vlak bij de oude stad met parking:</strong> beste keuze voor één nacht; auto laten staan en te voet eten/wandelen.</li>
+              <li><strong>Appartement met eigen parking:</strong> praktisch en vaak comfortabel; let op check-in, trappen en bereikbaarheid.</li>
+              <li><strong>Kleinschalig hotel bij de rivier:</strong> mooie sfeer en goede avondwandeling; check parking en geluid.</li>
+              <li><strong>Hotel iets buiten centrum met makkelijke parking:</strong> praktisch als comfort en vertreklogistiek belangrijker zijn.</li>
+              <li><strong>Accommodatie zonder parking midden in oude stad:</strong> liever vermijden tenzij parkeren heel duidelijk geregeld is.</li>
+            </ul>
+            <p><strong>Must-have:</strong> parking, airco, goed bed, rustige kamer, makkelijke bereikbaarheid met bagage, niet te veel trappen, diner/restaurants op loopafstand, snelle uitcheckmogelijkheid, goede reviews op comfort en parking en duidelijke route richting Podgorica / Montenegro.</p>
+            <p><strong>Nice-to-have:</strong> ligging in of vlak bij oude stad, balkon of terras, uitzicht op rivier of stad, ontbijt vroeg genoeg, koelkastje, lift, restaurant of café dichtbij en veilige parking tot vertrek.</p>
+            <p><strong>Minder belangrijk:</strong> luxe uitstraling, wellness, zwembad, grote kamer, veel faciliteiten en uitgebreid ontbijt als dat vertrek vertraagt.</p>
+            <p><strong>Beste ligging:</strong> oude stad / centrumrand is de beste balans; bij de Trebišnjica-rivier is mooi voor avondwandeling; iets buiten centrum kan handig zijn voor parking en rust; heuvel boven stad geeft uitzicht maar is minder handig te voet; te ver buiten Trebinje liever vermijden.</p>
+            <p><strong>Waar extra op letten:</strong> gegarandeerde parking, makkelijk uitrijden richting Podgorica, vroeg/flexibel ontbijt, restaurants op loopafstand, rustige kamer, airco, trappen, makkelijk betalen/check-out doen en rijtijd naar de grensroute.</p>
+          </section>
+
+          <section class="block-section">
+            <h3>Activiteiten en kostenindicatie voor dit blok</h3>
+            <ul>
+              <li><strong>Trebinje old town:</strong> prioriteit hoog. Gratis exclusief eten/drinken. Must-do, vooral late middag of avond.</li>
+              <li><strong>Trebišnjica-rivierwandeling:</strong> prioriteit hoog. Gratis. Rustige en makkelijke activiteit.</li>
+              <li><strong>Arslanagić / Perović-brug:</strong> prioriteit hoog. Gratis. Korte fotostop of onderdeel van wandeling.</li>
+              <li><strong>Hercegovačka Gračanica:</strong> prioriteit middel tot hoog bij goed weer. Gratis / kleine kosten mogelijk. Mooi voor zonsondergang, alleen als energie goed is.</li>
+              <li><strong>Wijnbar / wijnhuis:</strong> optioneel. Ongeveer €20-80+ voor 2 personen. Leuk voor sfeer, maar niet verplicht; bij zwangerschap kan focus ook op eten/sfeer liggen.</li>
+              <li><strong>Tvrdoš Monastery:</strong> optioneel. Meestal laag / donatie mogelijk. Alleen toevoegen als jullie vroeg in Trebinje zijn en energie hebben.</li>
+              <li><strong>Koffie / ijs / terras:</strong> prioriteit hoog. Ongeveer €10-30 voor 2 personen. Hoort bij de relaxte Trebinje-sfeer.</li>
+              <li><strong>Parkeren / lokale kosten:</strong> praktisch, ongeveer €0-20 afhankelijk van accommodatie.</li>
+              <li><strong>Tanken / routekosten vertrekdag:</strong> praktisch en afhankelijk van tankbeleid; apart onder brandstof/huurauto boeken, niet als activiteit.</li>
+            </ul>
+            <p><strong>Totaal realistisch activiteitenbudget:</strong> €20-80 exclusief accommodatie en normale maaltijden. Ruimer budget met wijnbar, uitgebreider diner en extra stops: €80-150.</p>
+          </section>
+
+          <section class="block-section">
+            <h3>Zwangerschap-vriendelijke aandachtspunten</h3>
+            <ul>
+              <li><strong>Warmte:</strong> Trebinje kan warm zijn eind juni. Plan wandelen vooral late middag of avond.</li>
+              <li><strong>Tempo:</strong> houd Trebinje rustig. Dit is een afbouwblok, geen intensieve excursiestop.</li>
+              <li><strong>Wandelen:</strong> oude stad en rivier zijn goed geschikt. Houd het compact en neem pauzes.</li>
+              <li><strong>Uitzichtpunt:</strong> Hercegovačka Gračanica alleen als het comfortabel voelt; met auto/taxi is veel beter dan te voet klimmen.</li>
+              <li><strong>Eten:</strong> kies een ontspannen dinerplek dichtbij hotel.</li>
+              <li><strong>Hydratatie:</strong> water mee bij wandeling en op vertrekdag.</li>
+              <li><strong>Vertrekdag:</strong> geen excursies plannen. De dag draait om grens, auto en vlucht.</li>
+              <li><strong>Grens:</strong> houd documenten bij de hand en plan extra marge.</li>
+              <li><strong>Auto:</strong> laat tanken en auto-inleveren niet tot het laatste moment komen.</li>
+              <li><strong>Accommodatie:</strong> airco, parking en makkelijke uitcheck zijn belangrijker dan charme.</li>
+            </ul>
+          </section>
+
+          <section class="block-section">
+            <h3>Wat wel en niet doen</h3>
+            <div class="drive-grid">
+              <div class="drive-card">
+                <strong>Wel doen</strong>
+                <ul><li>Trebinje houden als laatste sfeervolle stop.</li><li>Maandag op tijd aankomen.</li><li>Oude stad en rivierwandeling doen.</li><li>Diner op loopafstand kiezen.</li><li>Hercegovačka Gračanica alleen bij genoeg energie doen.</li><li>Hotel met parking boeken.</li><li>Dinsdag vroeg genoeg vertrekken.</li><li>Ruime marge nemen voor grens en luchthaven.</li><li>Spullen maandagavond al voorbereiden.</li><li>Laatste avond rustig houden.</li></ul>
+              </div>
+              <div class="drive-card">
+                <strong>Niet doen</strong>
+                <ul><li>Maandag te veel Mostar/Herzegovina-stops inhalen.</li><li>Pas laat in Trebinje aankomen.</li><li>Dinsdag een excursie plannen.</li><li>Vertrek naar luchthaven uitstellen.</li><li>Hotel zonder parking boeken.</li><li>Te veel vertrouwen op netto rijtijd.</li><li>Grenspassage onderschatten.</li><li>Laatste avond zwaar of laat maken.</li><li>Tanken en auto-inleveren op het laatste moment laten.</li><li>Trebinje zien als alleen praktische slaapplaats.</li></ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="block-section" id="trebinje-days">
+            <h3>Dagen binnen dit blok</h3>
+            <details class="day-card travel-day">
+              <summary>Dag 17 · maandag 29 juni · aankomstdag naar Trebinje</summary>
+              <div class="day-card-body">
+                <p><strong>Let op:</strong> deze dag is een overlapdag. In dit Trebinje-blok is hij vooral rustige aankomst in de laatste Bosnische stad en sfeervolle laatste avond.</p>
+                <div class="block-facts">
+                  <div class="block-fact"><strong>Start</strong>Mostar</div><div class="block-fact"><strong>Eindpunt</strong>Trebinje</div><div class="block-fact"><strong>Slapen</strong>Trebinje</div><div class="block-fact"><strong>Route</strong>Mostar → Radimlja / Stolac-optie → Trebinje</div><div class="block-fact"><strong>Afstand</strong>ongeveer 115-140 km</div><div class="block-fact"><strong>Rijtijd</strong>ongeveer 2-3 uur met stops</div><div class="block-fact"><strong>Dagtype</strong>overgangsdag, zuidelijk Herzegovina, kleine stad, laatste Bosnische avond</div><div class="block-fact"><strong>Hoofddoel</strong>rustig uit Mostar vertrekken en op tijd in Trebinje aankomen</div><div class="block-fact"><strong>Optionele stop</strong>Radimlja of Stolac</div><div class="block-fact"><strong>Niet doen</strong>zondag gemiste highlights allemaal inhalen</div>
+                </div>
+                <section class="advice"><h4>Hoofdadvies</h4><p>Gebruik deze dag als rustige overgang naar de finale van de reis. Kies hoogstens één stop onderweg en kom liever vroeg dan laat aan in Trebinje. De waarde zit niet in veel kilometers of stops, maar in een ontspannen laatste middag en avond.</p></section>
+                <section class="advice"><h4>Ideale dagindeling</h4><ul><li>Ochtend: korte wandeling of koffie in Mostar.</li><li>Late ochtend: check-out.</li><li>Middag: korte stop bij Radimlja of Stolac, of directe rit.</li><li>Namiddag: aankomst Trebinje, check-in en rust.</li><li>Late middag: oude stad en rivierwandeling.</li><li>Avond: diner in Trebinje.</li><li>Optioneel: zonsondergang bij Hercegovačka Gračanica.</li></ul></section>
+                <section class="advice"><h4>Hoofdactiviteiten onderweg</h4><ul><li><strong>Mostar ochtend:</strong> Stari Most is vroeg vaak mooier en rustiger. Korte wandeling, koffie, foto’s, niet te lang maken.</li><li><strong>Radimlja stećci:</strong> middeleeuwse grafstenen / erfgoedstop. Lage belasting en goede korte culturele stop.</li><li><strong>Stolac:</strong> kleine stad, rivier en geschiedenis. Alleen doen als jullie rustig genoeg uit Mostar vertrekken.</li><li><strong>Trebinje aankomst:</strong> rustige zuidelijke stad en finale van Bosnië en Herzegovina. Kom liever vroeg aan dan laat.</li></ul></section>
+                <section class="advice"><h4>Hoofdactiviteiten in Trebinje</h4><ul><li><strong>Trebinje old town:</strong> compacte oude stad, pleinen en terrassen. Beste late middag of avond; rustig slenteren, geen checklist.</li><li><strong>Trebišnjica-rivier:</strong> rivierwandeling, bruggen en avondlicht. Ideaal vóór of na diner.</li><li><strong>Arslanagić / Perović-brug:</strong> historische brug en fotostop, combineren met rivierwandeling.</li><li><strong>Hercegovačka Gračanica:</strong> uitzichtpunt / kerk boven de stad, mooi rond zonsondergang. Alleen doen als jullie nog energie hebben; lage belasting met auto/taxi.</li></ul></section>
+                <section class="advice"><h4>Low-energy alternatief</h4><ul><li>Rustige ochtend Mostar.</li><li>Directe rit naar Trebinje.</li><li>Check-in en rust.</li><li>Korte wandeling door oude stad.</li><li>Diner dichtbij hotel.</li><li>Geen Radimlja, Stolac of uitzichtpunt.</li></ul></section>
+                <section class="advice"><h4>Extra opties bij meer energie</h4><ul><li>Vroege Mostar-fotowandeling.</li><li>Radimlja als korte stop.</li><li>Koffie/lunch in Stolac.</li><li>Korte extra route door zuidelijk Herzegovina.</li><li>Hercegovačka Gračanica bij zonsondergang.</li><li>Wijnbar of korte wijnstop.</li><li>Extra wandeling langs de rivier.</li></ul></section>
+                <section class="advice"><h4>Praktische tips</h4><ul><li>Laat Mostar niet te laat worden.</li><li>Kies één stop onderweg, niet meerdere.</li><li>Neem water mee.</li><li>Trebinje is leuker als jullie nog een middag en avond hebben.</li><li>Houd rekening met warmte.</li><li>Check route en wegcondities.</li><li>Laat bagage niet zichtbaar in de auto bij stops.</li><li>Zorg dat accommodatie parking heeft.</li><li>Kies dinerplek op loopafstand.</li><li>Leg alvast spullen klaar voor de vlucht van dinsdag.</li></ul></section>
+                <section class="advice"><h4>Google Maps en kaartviewer</h4><p>Mostar → Radimlja → Stolac → Trebinje.</p><div class="route-actions"><a href="https://www.google.com/maps/dir/?api=1&origin=Mostar%2C%20Bosnia%20and%20Herzegovina&destination=Trebinje%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Radimlja%20Ste%C4%87ak%20Necropolis%2C%20Bosnia%20and%20Herzegovina%7CStolac%2C%20Bosnia%20and%20Herzegovina" target="_blank" rel="noopener">Open in Google Maps</a><button class="secondary" type="button" data-route-view="to-trebinje">Open in kaart</button></div></section>
+              </div>
+            </details>
+
+            <details class="day-card travel-day">
+              <summary>Dag 18 · dinsdag 30 juni · vertrekdag / terugvlucht</summary>
+              <div class="day-card-body">
+                <p><strong>Let op:</strong> dit is de laatste reisdag. Geen hotel meer, vandaag vliegen jullie terug. Weergeven als vlucht-/vertrekdag: ruim plannen, geen echte excursies.</p>
+                <div class="block-facts">
+                  <div class="block-fact"><strong>Start</strong>Trebinje</div><div class="block-fact"><strong>Eindpunt</strong>Podgorica Airport</div><div class="block-fact"><strong>Slapen</strong>geen hotel, terugvlucht</div><div class="block-fact"><strong>Route</strong>Trebinje → Podgorica Airport</div><div class="block-fact"><strong>Afstand</strong>ongeveer 120-145 km</div><div class="block-fact"><strong>Rijtijd</strong>ongeveer 2-2,5 uur netto, exclusief grens, tanken en auto-inleveren</div><div class="block-fact"><strong>Vlucht</strong>ongeveer 17:00 vanaf Podgorica</div><div class="block-fact"><strong>Dagtype</strong>vertrekdag / grensovergang / auto inleveren / vlucht</div><div class="block-fact"><strong>Hoofddoel</strong>ontspannen en met ruime marge op de luchthaven aankomen</div><div class="block-fact"><strong>Niet doen</strong>nog een echte excursie plannen</div>
+                </div>
+                <section class="advice"><h4>Hoofdadvies</h4><p>Laat deze dag praktisch en ruim blijven. Jullie moeten Montenegro weer in, eventueel tanken, de auto inleveren en op tijd bij de vlucht zijn. Vertrek niet te laat uit Trebinje. De luxe van Trebinje als laatste nacht werkt alleen als je de vertrekdag niet alsnog vol zet.</p></section>
+                <section class="advice"><h4>Ideale dagindeling</h4><ul><li>08:00-08:30: ontbijt.</li><li>09:00-09:30: uitchecken, spullen controleren.</li><li>09:30-10:00: vertrek uit Trebinje.</li><li>12:30-13:30: ruime marge omgeving Podgorica / luchthaven.</li><li>13:30-14:30: tanken, auto-inlevering voorbereiden, kleine lunch/snack.</li><li>15:00: uiterlijk op luchthaven / auto-inleveren / check-in.</li><li>17:00: vlucht.</li></ul></section>
+                <section class="advice"><h4>Hoofdactiviteit</h4><p>Geen echte activiteit. De hoofdactiviteit is ontspannen en op tijd naar de luchthaven rijden.</p></section>
+                <section class="advice"><h4>Optionele lichte ochtend</h4><p>Alleen als jullie heel vroeg wakker zijn en alles al klaarstaat: korte koffie in Trebinje, korte wandeling rond hotel of oude stad. Geen autorit naar extra bezienswaardigheid en geen lang ontbijt dat vertrek vertraagt.</p></section>
+                <section class="advice"><h4>Low-energy alternatief</h4><ul><li>Rustig ontbijt.</li><li>Direct uitchecken.</li><li>Direct naar Podgorica Airport.</li><li>Geen stops behalve tanken, toilet en korte snack.</li></ul></section>
+                <section class="advice"><h4>Extra opties bij meer energie</h4><ul><li>Korte koffiestop onderweg.</li><li>Lunch/snack bij Podgorica als jullie heel ruim op schema liggen.</li><li>Geen echte sightseeing meer.</li></ul></section>
+                <section class="advice"><h4>Praktische tips</h4><ul><li>Vertrek rond 10:00 of eerder.</li><li>Check grensdocumenten en huurautopapieren.</li><li>Houd paspoort/ID, groene kaart en huurcontract bij de hand.</li><li>Check tankbeleid van de huurauto.</li><li>Tank ruim op tijd.</li><li>Houd rekening met grenspassage en auto-inlevering.</li><li>Laat geen marge afhangen van geluk.</li><li>Zet navigatie offline klaar.</li><li>Neem water en snacks mee.</li><li>Plan niets dat teleurstelling geeft als het niet lukt.</li></ul></section>
+                <section class="advice"><h4>Risicopunten</h4><ul><li>Grensovergang kan langer duren dan verwacht.</li><li>Berg-/regionale wegen kunnen trager zijn dan Google Maps inschat.</li><li>Auto-inlevering kan tijd kosten.</li><li>Tankstation zoeken kost tijd.</li><li>Zomerdrukte bij luchthaven kan extra tijd vragen.</li><li>Zwangerschap maakt extra marge prettiger.</li></ul></section>
+                <section class="advice"><h4>Waarom geen laatste nacht Podgorica</h4><p>Podgorica zou praktischer zijn, maar minder sfeervol. Trebinje geeft een mooiere laatste avond en de rit naar Podgorica Airport blijft haalbaar als jullie op tijd vertrekken. Als maximale zekerheid belangrijker wordt dan sfeer, kan een laatste nacht Podgorica altijd nog, maar inhoudelijk is Trebinje mooier.</p></section>
+                <section class="advice"><h4>Google Maps en kaartviewer</h4><p>Trebinje → Podgorica Airport.</p><div class="route-actions"><a href="https://www.google.com/maps/dir/?api=1&origin=Trebinje%2C%20Bosnia%20and%20Herzegovina&destination=Podgorica%20Airport%2C%20Montenegro&travelmode=driving" target="_blank" rel="noopener">Open in Google Maps</a><button class="secondary" type="button" data-route-view="to-podgorica-airport">Open in kaart</button></div></section>
+              </div>
+            </details>
+          </section>
+
+          <section class="block-section">
+            <h3>Google Maps-links voor dit blok</h3>
+            <div class="route-actions">
+              <a href="https://www.google.com/maps/dir/?api=1&origin=Mostar%2C%20Bosnia%20and%20Herzegovina&destination=Trebinje%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Radimlja%20Ste%C4%87ak%20Necropolis%2C%20Bosnia%20and%20Herzegovina%7CStolac%2C%20Bosnia%20and%20Herzegovina" target="_blank" rel="noopener">Dag 17 aankomstrit</a><button class="secondary" type="button" data-route-view="to-trebinje">Dag 17 in kaart</button>
+              <a class="secondary" href="https://www.google.com/maps/dir/?api=1&origin=Trebinje%2C%20Bosnia%20and%20Herzegovina&destination=Podgorica%20Airport%2C%20Montenegro&travelmode=driving" target="_blank" rel="noopener">Dag 18 vertrekrit</a><button class="secondary" type="button" data-route-view="to-podgorica-airport">Dag 18 in kaart</button>
+              <a class="secondary" href="https://www.google.com/maps/dir/?api=1&origin=Trebinje%20Old%20Town%2C%20Bosnia%20and%20Herzegovina&destination=Trebinje%20Old%20Town%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Arslanagi%C4%87%20Bridge%2C%20Trebinje%7CHercegova%C4%8Dka%20Gra%C4%8Danica%2C%20Trebinje" target="_blank" rel="noopener">Korte Trebinje-route</a><button class="secondary" type="button" data-route-view="trebinje-local">Trebinje in kaart</button>
+            </div>
+          </section>
+        </details>
+        <details class="block-card" id="final-day-block">
+          <summary>
+            <div class="block-hero">
+              <h2>Laatste dag / terugvlucht</h2>
+              <p>30 juni · Trebinje → Podgorica Airport · praktische vertrekdag met ruime marge.</p>
+            </div>
+          </summary>
+          <div class="block-sticky">
+            <div>
+              <strong>Laatste dag</strong>
+              <span>30 juni · geen hotel · vlucht vanaf Podgorica rond 17:00</span>
+            </div>
+            <div class="sticky-actions">
+              <a href="#final-day-details">Details</a>
+              <button class="collapse-block" type="button">Inklappen</button>
+            </div>
+          </div>
+
+          <section class="block-section">
+            <h3>Samenvatting voor snelle scan</h3>
+            <div class="scan-box">
+              <p><strong>Laatste dag · dinsdag 30 juni 2026.</strong><br>Geen hotelovernachting meer.<br>Vlucht vanaf Podgorica Airport rond 17:00.</p>
+              <p><strong>Route:</strong> Trebinje → Podgorica Airport.</p>
+              <p><strong>Afstand:</strong> ongeveer 120-145 km, afhankelijk van exacte route.</p>
+              <p><strong>Rijtijd:</strong> ongeveer 2-2,5 uur netto rijden, exclusief grenspassage, tanken, eventuele pauzes en auto-inlevering.</p>
+              <p><strong>Rol in de reis:</strong> dit is geen inhoudelijke reisdag meer, maar een praktische vertrekdag. Omdat jullie vanuit Bosnië en Herzegovina terugrijden naar Montenegro, is extra marge belangrijk voor grenspassage, tanken, huurauto-inlevering en luchthavenprocedures.</p>
+              <p><strong>Hoofdadvies:</strong> plan vandaag geen echte excursie meer. Ontbijt rustig, vertrek op tijd uit Trebinje, houd documenten bij de hand en zorg dat jullie uiterlijk rond 15:00 op Podgorica Airport zijn. De belangrijkste winst is dat de dag ontspannen voelt.</p>
+              <p><strong>Must-do:</strong> rustig ontbijt, spullen controleren, op tijd uitchecken, huurautopapieren/paspoort/ID/groene kaart bij de hand houden, ruim op tijd vertrekken, tanken volgens huurautobeleid, auto inleveren en uiterlijk rond 15:00 op Podgorica Airport zijn.</p>
+              <p><strong>Optioneel:</strong> korte koffie in Trebinje als alles klaarstaat, korte wandeling rond hotel of oude stad, of korte snack/lunch bij Podgorica of luchthavenomgeving als jullie ruim op schema liggen.</p>
+              <p><strong>Low-energy:</strong> ontbijt, direct uitchecken, direct naar Podgorica Airport, alleen stoppen voor tanken, toilet en snack, geen stads- of sightseeingprogramma.</p>
+              <p><strong>Niet doen:</strong> nog een echte excursie plannen, laat vertrekken, grenspassage onderschatten, tanken of auto-inlevering krap plannen, vertrouwen op alleen netto rijtijd, lange lunch/omweg plannen of Podgorica centrum uitgebreid bezoeken.</p>
+            </div>
+          </section>
+
+          <section class="block-section" id="final-day-details">
+            <h3>Dagoverzicht</h3>
+            <div class="block-facts">
+              <div class="block-fact"><strong>Datum</strong>dinsdag 30 juni 2026</div>
+              <div class="block-fact"><strong>Start</strong>Trebinje, Bosnië en Herzegovina</div>
+              <div class="block-fact"><strong>Eindpunt</strong>Podgorica Airport, Montenegro</div>
+              <div class="block-fact"><strong>Slapen</strong>geen hotel, terugvlucht</div>
+              <div class="block-fact"><strong>Route</strong>Trebinje → Podgorica Airport</div>
+              <div class="block-fact"><strong>Afstand</strong>ongeveer 120-145 km</div>
+              <div class="block-fact"><strong>Rijtijd</strong>ongeveer 2-2,5 uur netto rijden</div>
+              <div class="block-fact"><strong>Vlucht</strong>rond 17:00 vanaf Podgorica Airport</div>
+              <div class="block-fact"><strong>Dagtype</strong>vertrekdag / grensovergang / huurauto inleveren / terugvlucht</div>
+              <div class="block-fact"><strong>Hoofddoel</strong>ontspannen en met ruime marge op de luchthaven aankomen</div>
+            </div>
+            <p><strong>Extra tijd nodig voor:</strong> grenspassage Bosnië en Herzegovina → Montenegro, tanken, huurauto-inlevering, bagage, check-in/security, eventuele zomerdrukte en toilet-/snackpauze.</p>
+            <p><strong>Belangrijkste advies:</strong> geen inhoudelijk programma meer plannen. Deze dag moet simpel en ruim blijven.</p>
+          </section>
+
+          <section class="block-section">
+            <h3>Aanbevolen dagindeling</h3>
+            <ul>
+              <li><strong>08:00-08:30:</strong> rustig ontbijt in Trebinje.</li>
+              <li><strong>08:30-09:00:</strong> spullen controleren, koffers sluiten, documenten klaarleggen.</li>
+              <li><strong>09:00-09:30:</strong> uitchecken, auto inladen, route checken.</li>
+              <li><strong>09:30-10:00:</strong> vertrek uit Trebinje.</li>
+              <li><strong>10:00-12:30:</strong> rit richting Montenegro / Podgorica, inclusief grensmarge.</li>
+              <li><strong>12:30-13:30:</strong> ruime marge in omgeving Podgorica of luchthavengebied.</li>
+              <li><strong>13:30-14:30:</strong> tanken, kleine lunch/snack, huurauto-inlevering voorbereiden.</li>
+              <li><strong>15:00:</strong> uiterlijk op Podgorica Airport / auto inleveren / check-in.</li>
+              <li><strong>17:00:</strong> vlucht naar huis.</li>
+            </ul>
+          </section>
+
+          <section class="block-section">
+            <h3>Hoofdadvies</h3>
+            <p>Laat deze dag leeg en praktisch blijven. De keuze om de laatste nacht in Trebinje te slapen is mooi, maar werkt alleen goed als jullie de vertrekdag niet alsnog vol maken.</p>
+            <p>De rit zelf is niet extreem lang, maar er zijn meerdere onzekerheden: grenspassage, regionale wegen, tanken, huurauto-inlevering, luchthavenprocedures en eventuele vertraging door zomerdrukte. Rond 10:00 of eerder vertrekken maakt de dag ruim in plaats van spannend.</p>
+          </section>
+
+          <section class="block-section">
+            <h3>Waarom geen extra programma</h3>
+            <p>Deze dag moet geen “laatste kans om nog iets te zien”-dag worden. De reis is inhoudelijk al mooi afgerond met Trebinje op maandagavond.</p>
+            <p>Extra programma voegt weinig toe, maar kan veel stress veroorzaken. Zeker omdat jullie nog een grens over moeten, een huurauto moeten inleveren, een vlucht moeten halen en met zwangerschap extra comfort en marge willen houden. De beste afsluiting is rustig ontbijten, op tijd rijden en zonder haast aankomen.</p>
+          </section>
+
+          <section class="block-section">
+            <h3>Varianten</h3>
+            <div class="drive-grid">
+              <div class="drive-card">
+                <strong>Optionele lichte ochtend</strong>
+                <ul><li>Alleen als jullie vroeg wakker zijn, alles al ingepakt is, het hotel makkelijk uitcheckt en jullie uiterlijk rond 10:00 kunnen vertrekken.</li><li>Korte koffie in Trebinje.</li><li>Korte wandeling rond hotel of oude stad.</li><li>Nog één blik op de oude stad.</li><li>Kleine snack halen voor onderweg.</li></ul>
+              </div>
+              <div class="drive-card">
+                <strong>Niet doen in de ochtend</strong>
+                <ul><li>Naar een uitzichtpunt rijden.</li><li>Een klooster of wijnhuis bezoeken.</li><li>Lang ontbijten als dat vertrek vertraagt.</li><li>Nog Radimlja, Stolac of iets anders willen inhalen.</li></ul>
+              </div>
+            </div>
+            <p><strong>Low-energy variant:</strong> ontbijt rustig, check uit, rijd direct naar Podgorica Airport, stop alleen voor tanken/toilet/snack, lever de auto ruim op tijd in en houd de dag zo saai mogelijk. Dit is waarschijnlijk de beste variant als de reis intensief genoeg is geweest.</p>
+            <p><strong>Extra opties als alles heel soepel gaat:</strong> korte koffiestop onderweg, kleine lunch/snack in of rond Podgorica, even rustig zitten vóór auto-inlevering, tanken zonder haast en spullen opnieuw ordenen vóór check-in. Geen echte sightseeing meer plannen.</p>
+          </section>
+
+          <section class="block-section">
+            <h3>Praktische checklist</h3>
+            <div class="drive-grid">
+              <div class="drive-card">
+                <strong>Documenten</strong>
+                <ul><li>Paspoort of ID.</li><li>Rijbewijs.</li><li>Huurcontract.</li><li>Groene kaart / verzekeringsbewijs.</li><li>Cross-border toestemming huurauto.</li><li>Vluchtgegevens.</li><li>Eventuele reisverzekering / medische info.</li><li>Zwangerschapsinformatie indien relevant.</li></ul>
+              </div>
+              <div class="drive-card">
+                <strong>Auto</strong>
+                <ul><li>Tankbeleid controleren.</li><li>Auto op schade controleren vóór inlevering.</li><li>Foto’s maken bij inlevering indien handig.</li><li>Navigatie naar juiste terminal / rental return.</li><li>Geen waardevolle spullen zichtbaar laten tijdens stops.</li></ul>
+              </div>
+              <div class="drive-card">
+                <strong>Bagage</strong>
+                <ul><li>Paspoorten en papieren niet in ingecheckte bagage.</li><li>Water/snacks voor onderweg.</li><li>Medicatie / belangrijke spullen in handbagage.</li><li>Laagjes voor vliegtuig.</li><li>Opladers bij de hand.</li></ul>
+              </div>
+              <div class="drive-card">
+                <strong>Timing</strong>
+                <ul><li>Vertrek liever te vroeg dan te laat.</li><li>Houd grensmarge.</li><li>Houd tankmarge.</li><li>Houd auto-inlevermarge.</li><li>Uiterlijk rond 15:00 op de luchthaven zijn.</li></ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="block-section">
+            <h3>Risicopunten</h3>
+            <ul>
+              <li><strong>Grenspassage:</strong> kan langer duren dan verwacht. Houd marge.</li>
+              <li><strong>Rijtijd:</strong> netto rijtijd zegt niet alles. Regionale wegen, bochten en verkeer kunnen vertragen.</li>
+              <li><strong>Tanken:</strong> tank niet op het allerlaatste moment. Check vooraf handige tankstations.</li>
+              <li><strong>Huurauto-inlevering:</strong> kan langer duren door wachtrij, controle of papierwerk.</li>
+              <li><strong>Luchthaven:</strong> in de zomer kan het drukker zijn. Reken niet te krap.</li>
+              <li><strong>Zwangerschap:</strong> extra marge voorkomt stress, en stress vermijden is belangrijker dan nog iets zien.</li>
+            </ul>
+          </section>
+
+          <section class="block-section">
+            <h3>Zwangerschap-vriendelijke aandachtspunten</h3>
+            <ul>
+              <li>Vertrek op tijd zodat er geen haast ontstaat.</li>
+              <li>Plan toiletpauzes.</li>
+              <li>Neem water en snacks mee.</li>
+              <li>Vermijd een volle ochtend.</li>
+              <li>Zorg dat belangrijke spullen makkelijk bereikbaar zijn.</li>
+              <li>Rijd rustig op bochtige wegen.</li>
+              <li>Neem pauze als dat nodig is.</li>
+              <li>Niet te lang wachten met eten.</li>
+              <li>Houd de luchthavenmarge ruim.</li>
+              <li>Laat deze dag vooral comfortabel zijn.</li>
+            </ul>
+          </section>
+
+          <section class="block-section">
+            <h3>Wat wel en niet doen</h3>
+            <div class="drive-grid">
+              <div class="drive-card">
+                <strong>Wel doen</strong>
+                <ul><li>Rustig ontbijten.</li><li>Rond 10:00 of eerder vertrekken.</li><li>Documenten klaarleggen.</li><li>Ruime grensmarge nemen.</li><li>Tanken op tijd doen.</li><li>Auto-inlevering ruim plannen.</li><li>Water en snacks meenemen.</li><li>Laatste dag simpel houden.</li><li>Uiterlijk rond 15:00 op de luchthaven zijn.</li></ul>
+              </div>
+              <div class="drive-card">
+                <strong>Niet doen</strong>
+                <ul><li>Extra excursie plannen.</li><li>Laat uitchecken.</li><li>Podgorica centrum nog uitgebreid bezoeken.</li><li>Grenspassage krap inschatten.</li><li>Tanken uitstellen tot het laatste moment.</li><li>Auto-inlevering onderschatten.</li><li>Te veel vertrouwen op Google Maps netto rijtijd.</li><li>De dag vol maken omdat het “toch maar 2 uur rijden” is.</li></ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="block-section">
+            <h3>Google Maps-link</h3>
+            <div class="route-actions">
+              <a href="https://www.google.com/maps/dir/?api=1&origin=Trebinje%2C%20Bosnia%20and%20Herzegovina&destination=Podgorica%20Airport%2C%20Montenegro&travelmode=driving" target="_blank" rel="noopener">Trebinje → Podgorica Airport</a>
+              <button class="secondary" type="button" data-route-view="to-podgorica-airport">Open in kaart</button>
+            </div>
+          </section>
+        </details>
       </section>
     </aside>
     <main class="mapwrap">
-      <details class="map-control" open>
+      <details class="map-control">
         <summary>Routefilter</summary>
         <div class="map-control-body">
           <label for="route-filter">Toon route</label>
@@ -990,7 +1771,7 @@
             <button class="primary" type="button" id="apply-route-filter">Toon route</button>
             <button type="button" id="reset-route-filter">Reset</button>
           </div>
-          <div class="map-status" id="map-status">Huidige totaalroute zichtbaar.</div>
+          <div class="map-status" id="map-status" aria-live="polite">Huidige totaalroute zichtbaar.</div>
         </div>
       </details>
       <div class="zoomhint">Klik links op een dag om alleen dat traject uit te lichten.</div>
@@ -998,558 +1779,13 @@
     </main>
   </div>
   <nav class="mobile-nav" aria-label="Mobiele navigatie">
-    <button type="button" data-view-target="overview" aria-current="true">Overzicht</button>
-    <button type="button" data-view-target="map">Kaart</button>
-    <button type="button" data-view-target="blocks">Reisplan</button>
+    <button type="button" data-view-target="overview" onclick="setView('overview')" aria-current="true">Overzicht</button>
+    <button type="button" data-view-target="map" onclick="setView('map')">Kaart</button>
+    <button type="button" data-view-target="blocks" onclick="setView('blocks')">Reisplan</button>
   </nav>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script>
-    const days = [
-      {
-        id: "arrival",
-        dayNumber: 1,
-        date: "Za 13 juni 2026",
-        title: "Aankomst in Podgorica",
-        overnight: "Podgorica",
-        points: [
-          { name: "Podgorica Airport (TGD)", lat: 42.3594, lon: 19.2519 },
-          { name: "Podgorica", lat: 42.4304, lon: 19.2594 }
-        ],
-        notes: "Late aankomst rond 23:30. Alleen naar hotel, inchecken en slapen.",
-        routeLink: "https://www.google.com/maps/dir/?api=1&origin=Podgorica%20Airport%2C%20Montenegro&destination=Podgorica%2C%20Montenegro&travelmode=driving"
-      },
-      {
-        id: "to-virpazar",
-        dayNumber: 2,
-        date: "Zo 14 juni 2026",
-        title: "Podgorica → Virpazar",
-        overnight: "Virpazar / Lake Skadar",
-        points: [
-          { name: "Podgorica", lat: 42.4304, lon: 19.2594 },
-          { name: "Virpazar", lat: 42.2467, lon: 19.0917 }
-        ],
-        notes: "Korte, makkelijke rit van ongeveer 30-35 km naar Lake Skadar.",
-        routeLink: "https://www.google.com/maps/dir/?api=1&origin=Podgorica%2C%20Montenegro&destination=Virpazar%2C%20Montenegro&travelmode=driving"
-      },
-      {
-        id: "skadar-base",
-        dayNumber: 3,
-        date: "Ma 15 juni 2026",
-        title: "Lake Skadar basisroute",
-        overnight: "Virpazar / Lake Skadar",
-        points: [
-          { name: "Virpazar", lat: 42.2467, lon: 19.0917 },
-          { name: "Godinje", lat: 42.2477, lon: 19.1728 },
-          { name: "Murici Beach", lat: 42.2149, lon: 19.1448 },
-          { name: "Virpazar", lat: 42.2467, lon: 19.0917 }
-        ],
-        notes: "Basisvariant voor de Lake Skadar-dag: boottocht, lunch/rust, Godinje en eventueel Murići.",
-        routeLink: "https://www.google.com/maps/dir/?api=1&origin=Virpazar%2C%20Montenegro&destination=Virpazar%2C%20Montenegro&travelmode=driving&waypoints=Godinje%2C%20Montenegro%7CMurici%20Beach%2C%20Montenegro"
-      },
-      {
-        id: "skadar-extended",
-        dayNumber: 3,
-        date: "Ma 15 juni 2026",
-        title: "Lake Skadar uitgebreide route",
-        overnight: "Virpazar / Lake Skadar",
-        points: [
-          { name: "Virpazar", lat: 42.2467, lon: 19.0917 },
-          { name: "Besac Fortress", lat: 42.2478, lon: 19.0947 },
-          { name: "Godinje", lat: 42.2477, lon: 19.1728 },
-          { name: "Murici Beach", lat: 42.2149, lon: 19.1448 },
-          { name: "Karuc", lat: 42.3259, lon: 19.1401 },
-          { name: "Virpazar", lat: 42.2467, lon: 19.0917 }
-        ],
-        notes: "Uitgebreide variant met Besac Fortress, Godinje, Murići en Karuč. Alleen kiezen bij genoeg energie.",
-        routeLink: "https://www.google.com/maps/dir/?api=1&origin=Virpazar%2C%20Montenegro&destination=Virpazar%2C%20Montenegro&travelmode=driving&waypoints=Besac%20Fortress%2C%20Montenegro%7CGodinje%2C%20Montenegro%7CMurici%20Beach%2C%20Montenegro%7CKaruc%2C%20Montenegro"
-      },
-      {
-        id: "to-perast",
-        dayNumber: 4,
-        date: "Di 16 juni 2026",
-        title: "Virpazar → Perast via Pavlova Strana",
-        overnight: "Perast / Kotor Bay",
-        points: [
-          { name: "Virpazar", lat: 42.2467, lon: 19.0917 },
-          { name: "Pavlova Strana Viewpoint", lat: 42.3625, lon: 19.0674 },
-          { name: "Cetinje", lat: 42.3906, lon: 18.9142 },
-          { name: "Njegos Mausoleum / Lovcen", lat: 42.3992, lon: 18.8372 },
-          { name: "Perast", lat: 42.4869, lon: 18.6994 }
-        ],
-        notes: "Scenic transferdag van Lake Skadar naar Kotor Bay.",
-        routeLink: "https://www.google.com/maps/dir/?api=1&origin=Virpazar%2C%20Montenegro&destination=Perast%2C%20Montenegro&travelmode=driving&waypoints=Pavlova%20Strana%20Viewpoint%2C%20Montenegro%7CCetinje%2C%20Montenegro%7CNjegos%20Mausoleum%2C%20Montenegro"
-      },
-      {
-        id: "kotor-heritage",
-        dayNumber: 5,
-        date: "Wo 17 juni 2026",
-        title: "Klassieke erfgoeddag in de Baai van Kotor",
-        overnight: "Perast / Kotor Bay",
-        points: [
-          { name: "Perast", lat: 42.4869, lon: 18.6994 },
-          { name: "Risan Roman Mosaics", lat: 42.5142, lon: 18.6954 },
-          { name: "Kotor Old Town", lat: 42.4250, lon: 18.7712 },
-          { name: "Dobrota", lat: 42.4540, lon: 18.7680 },
-          { name: "Perast", lat: 42.4869, lon: 18.6994 }
-        ],
-        notes: "Erfgoeddag met Perast, Our Lady of the Rocks, Risan, Kotor en Dobrota als rustige afsluiter.",
-        routeLink: "https://www.google.com/maps/dir/?api=1&origin=Perast%2C%20Montenegro&destination=Perast%2C%20Montenegro&travelmode=driving&waypoints=Risan%20Roman%20Mosaics%2C%20Montenegro%7CKotor%20Old%20Town%2C%20Montenegro%7CDobrota%2C%20Montenegro"
-      },
-      {
-        id: "kotor-cable",
-        dayNumber: 6,
-        date: "Do 18 juni 2026",
-        title: "Rustige baaigevoelsdag",
-        overnight: "Perast / Kotor Bay",
-        points: [
-          { name: "Perast", lat: 42.4869, lon: 18.6994 },
-          { name: "Kotor Cable Car", lat: 42.4018, lon: 18.7634 },
-          { name: "Kotor Old Town", lat: 42.4250, lon: 18.7712 },
-          { name: "Morinj", lat: 42.4906, lon: 18.6518 },
-          { name: "Perast", lat: 42.4869, lon: 18.6994 }
-        ],
-        notes: "Halve-dag-plus-rust-dag: Kotor Cable Car bij helder weer of een rustige baaiplek.",
-        routeLink: "https://www.google.com/maps/dir/?api=1&origin=Perast%2C%20Montenegro&destination=Perast%2C%20Montenegro&travelmode=driving&waypoints=Kotor%20Cable%20Car%2C%20Montenegro%7CKotor%20Old%20Town%2C%20Montenegro%7CMorinj%2C%20Montenegro"
-      },
-      {
-        id: "herceg-novi",
-        dayNumber: 7,
-        date: "Vr 19 juni 2026",
-        title: "Extra baaidag met keuzevrijheid",
-        overnight: "Perast / Kotor Bay",
-        points: [
-          { name: "Perast", lat: 42.4869, lon: 18.6994 },
-          { name: "Herceg Novi", lat: 42.4531, lon: 18.5375 },
-          { name: "Rose", lat: 42.4254, lon: 18.5580 },
-          { name: "Perast", lat: 42.4869, lon: 18.6994 }
-        ],
-        notes: "Keuzedag: rustdag in Perast of richting Herceg Novi en eventueel Rose / Luštica.",
-        routeLink: "https://www.google.com/maps/dir/?api=1&origin=Perast%2C%20Montenegro&destination=Perast%2C%20Montenegro&travelmode=driving&waypoints=Herceg%20Novi%2C%20Montenegro%7CRose%2C%20Montenegro"
-      },
-      {
-        id: "to-zabljak",
-        dayNumber: 8,
-        date: "Za 20 juni 2026",
-        title: "Perast → Žabljak via Nikšić",
-        overnight: "Žabljak / Durmitor",
-        points: [
-          { name: "Perast", lat: 42.4869, lon: 18.6994 },
-          { name: "Nikšić", lat: 42.7731, lon: 18.9445 },
-          { name: "Žabljak", lat: 43.1555, lon: 19.1226 }
-        ],
-        notes: "Transferdag van de baai naar Durmitor, met Nikšić als koffie- of lunchstop.",
-        routeLink: "https://www.google.com/maps/dir/?api=1&origin=Perast%2C%20Montenegro&destination=%C5%BDabljak%2C%20Montenegro&travelmode=driving&waypoints=Nik%C5%A1i%C4%87%2C%20Montenegro"
-      },
-      {
-        id: "durmitor-black-lake",
-        dayNumber: 9,
-        date: "Zo 21 juni 2026",
-        title: "Durmitor rustig verkennen",
-        overnight: "Žabljak / Durmitor",
-        points: [
-          { name: "Žabljak", lat: 43.1555, lon: 19.1226 },
-          { name: "Black Lake / Crno Jezero", lat: 43.1460, lon: 19.0860 },
-          { name: "Ćurevac viewpoint", lat: 43.2080, lon: 19.0910 },
-          { name: "Žabljak", lat: 43.1555, lon: 19.1226 }
-        ],
-        notes: "Rustige bergdag met Black Lake en eventueel Ćurevac viewpoint.",
-        routeLink: "https://www.google.com/maps/dir/?api=1&origin=%C5%BDabljak%2C%20Montenegro&destination=%C5%BDabljak%2C%20Montenegro&travelmode=driving&waypoints=Crno%20Jezero%2C%20Montenegro%7CCurevac%20viewpoint%2C%20Montenegro"
-      },
-      {
-        id: "durmitor-sedlo",
-        dayNumber: 10,
-        date: "Ma 22 juni 2026",
-        title: "Durmitor panoramadag",
-        overnight: "Žabljak / Durmitor",
-        points: [
-          { name: "Žabljak", lat: 43.1555, lon: 19.1226 },
-          { name: "Sedlo Pass", lat: 43.0825, lon: 18.9880 },
-          { name: "Trsa", lat: 43.2510, lon: 18.7790 },
-          { name: "Žabljak", lat: 43.1555, lon: 19.1226 }
-        ],
-        notes: "Weersafhankelijke panoramadag via Sedlo en eventueel een stuk richting Trsa / Durmitor Ring.",
-        routeLink: "https://www.google.com/maps/dir/?api=1&origin=%C5%BDabljak%2C%20Montenegro&destination=%C5%BDabljak%2C%20Montenegro&travelmode=driving&waypoints=Sedlo%20Pass%2C%20Montenegro%7CTrsa%2C%20Montenegro"
-      },
-      {
-        id: "tara-canyon",
-        dayNumber: 11,
-        date: "Di 23 juni 2026",
-        title: "Tara Canyon-dag",
-        overnight: "Žabljak / Durmitor",
-        points: [
-          { name: "Žabljak", lat: 43.1555, lon: 19.1226 },
-          { name: "Đurđevića Tara Bridge", lat: 43.1507, lon: 19.2957 },
-          { name: "Žabljak", lat: 43.1555, lon: 19.1226 }
-        ],
-        notes: "Canyon- en uitzichtdag rond Đurđevića Tara Bridge zonder avontuur als basis.",
-        routeLink: "https://www.google.com/maps/dir/?api=1&origin=%C5%BDabljak%2C%20Montenegro&destination=%C5%BDabljak%2C%20Montenegro&travelmode=driving&waypoints=%C4%90ur%C4%91evi%C4%87a%20Tara%20Bridge%2C%20Montenegro"
-      },
-      {
-        id: "to-tjentiste",
-        dayNumber: 12,
-        date: "Wo 24 juni 2026",
-        title: "Žabljak → Tjentište via Piva",
-        overnight: "Tjentište / Sutjeska",
-        points: [
-          { name: "Žabljak", lat: 43.1555, lon: 19.1226 },
-          { name: "Piva Lake Viewpoint", lat: 43.1330, lon: 18.8360 },
-          { name: "Piva Monastery", lat: 43.1078, lon: 18.8458 },
-          { name: "Tjentište", lat: 43.3482, lon: 18.6902 }
-        ],
-        notes: "Scenic transfer via Piva Lake en Piva Monastery richting Sutjeska.",
-        routeLink: "https://www.google.com/maps/dir/?api=1&origin=%C5%BDabljak%2C%20Montenegro&destination=Tjenti%C5%A1te%2C%20Bosnia%20and%20Herzegovina&travelmode=driving&waypoints=Piva%20Lake%20Viewpoint%2C%20Montenegro%7CPiva%20Monastery%2C%20Montenegro"
-      }
-    ];
-    const colors = ["#1d4ed8", "#047857", "#b91c1c", "#7c3aed", "#ea580c", "#0f766e", "#4f46e5", "#0891b2", "#65a30d", "#c026d3", "#0369a1", "#be123c", "#0f766e", "#9333ea", "#ca8a04", "#334155", "#dc2626", "#2563eb", "#16a34a", "#475569"];
-    const fullRouteIds = ["arrival", "to-virpazar", "skadar-base", "to-perast", "kotor-heritage", "kotor-cable", "herceg-novi", "to-zabljak", "durmitor-black-lake", "durmitor-sedlo", "tara-canyon", "to-tjentiste"];
-    const routeFilterGroups = [
-      { label: "Aankomst", ids: ["arrival", "to-virpazar"] },
-      { label: "Virpazar / Lake Skadar", ids: ["skadar-base", "skadar-extended", "to-perast"] },
-      { label: "Perast / Kotor Bay", ids: ["kotor-heritage", "kotor-cable", "herceg-novi", "to-zabljak"] },
-      { label: "Žabljak / Durmitor", ids: ["to-zabljak", "durmitor-black-lake", "durmitor-sedlo", "tara-canyon", "to-tjentiste"] }
-    ];
-
-    const map = L.map('map', { preferCanvas: true }).setView([42.95, 18.9], 8);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18,
-      attribution: '&copy; OpenStreetMap'
-    }).addTo(map);
-
-    const dayLayers = [];
-    const allBounds = L.latLngBounds([]);
-    let activeDayIndex = null;
-    let pendingFocusIndex = null;
-
-    function pointsToCoords(points) {
-      return points.map(p => [p.lon, p.lat]).join(';');
-    }
-
-    async function fetchRoadGeometry(points) {
-      if (points.length < 2) return null;
-      const coords = pointsToCoords(points);
-      const url = `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson&steps=false`;
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data.routes && data.routes[0] && data.routes[0].geometry) return data.routes[0].geometry.coordinates;
-      } catch (e) { }
-      return null;
-    }
-
-    function addMarkers(points, layer, color, startIndex) {
-      points.forEach((p, idx) => {
-        const n = startIndex + idx + 1;
-        const marker = L.circleMarker([p.lat, p.lon], {
-          radius: idx === 0 || idx === points.length - 1 ? 6.5 : 5,
-          color: color,
-          weight: 2,
-          fillColor: '#ffffff',
-          fillOpacity: 1
-        }).bindPopup(`<strong>${p.name}</strong><br>Stop ${n}`);
-        marker.addTo(layer);
-        allBounds.extend([p.lat, p.lon]);
-      });
-    }
-
-    async function buildDay(day, index) {
-      const color = colors[index % colors.length];
-      const group = L.layerGroup();
-      const road = await fetchRoadGeometry(day.points);
-      if (road && road.length) {
-        const latlngs = road.map(c => [c[1], c[0]]);
-        L.polyline(latlngs, { color, weight: 5, opacity: 0.82 }).addTo(group);
-        latlngs.forEach(ll => allBounds.extend(ll));
-      } else if (day.points.length >= 2) {
-        L.polyline(day.points.map(p => [p.lat, p.lon]), { color, weight: 4, opacity: 0.55 }).addTo(group);
-      }
-      addMarkers(day.points, group, color, 0);
-      dayLayers.push({ group, day, color });
-    }
-
-    function setView(view) {
-      document.body.dataset.view = view;
-      document.querySelectorAll('[data-view-target]').forEach((button) => {
-        button.setAttribute('aria-current', String(button.dataset.viewTarget === view));
-      });
-
-      if (view === 'map') {
-        setTimeout(() => {
-          map.invalidateSize();
-          if (activeDayIndex !== null && dayLayers[activeDayIndex]) {
-            fitDayBounds(activeDayIndex);
-          } else {
-            fitAll();
-          }
-        }, 80);
-      }
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function setupBlockControls() {
-      document.querySelectorAll('.block-card').forEach((block) => {
-        block.querySelectorAll('.collapse-block').forEach((button) => {
-          button.addEventListener('click', () => {
-            const sticky = block.querySelector('.block-sticky');
-            if (sticky) {
-              sticky.classList.remove('is-fixed');
-              sticky.removeAttribute('style');
-            }
-            block.querySelectorAll('details').forEach((details) => {
-              details.open = false;
-            });
-            block.open = false;
-            block.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          });
-        });
-
-        block.addEventListener('toggle', updateStickyBlockBars);
-      });
-    }
-
-    function setupRouteViewerButtons() {
-      document.querySelectorAll('[data-route-view]').forEach((button) => {
-        button.addEventListener('click', () => {
-          focusRouteById(button.dataset.routeView);
-        });
-      });
-    }
-
-    function setupMapRouteFilter() {
-      const select = document.getElementById('route-filter');
-      const apply = document.getElementById('apply-route-filter');
-      const reset = document.getElementById('reset-route-filter');
-      if (!select || !apply || !reset) return;
-
-      routeFilterGroups.forEach((group) => {
-        const optgroup = document.createElement('optgroup');
-        optgroup.label = group.label;
-        group.ids.forEach((routeId) => {
-          const route = days.find(day => day.id === routeId);
-          if (!route) return;
-          const option = document.createElement('option');
-          option.value = route.id;
-          option.textContent = `${route.date} · ${route.title}`;
-          optgroup.appendChild(option);
-        });
-        select.appendChild(optgroup);
-      });
-
-      apply.addEventListener('click', () => {
-        if (select.value === 'all') {
-          showAll();
-        } else {
-          focusRouteById(select.value);
-        }
-      });
-
-      select.addEventListener('change', () => {
-        if (select.value !== 'all') focusRouteById(select.value);
-      });
-
-      reset.addEventListener('click', () => {
-        select.value = 'all';
-        showAll();
-      });
-    }
-
-    function setupStayNavigation() {
-      document.querySelectorAll('[data-block-target]').forEach((button) => {
-        button.addEventListener('click', () => {
-          const block = document.getElementById(button.dataset.blockTarget);
-          if (!block) return;
-
-          setView('blocks');
-          block.open = true;
-
-          setTimeout(() => {
-            block.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            updateStickyBlockBars();
-          }, 120);
-        });
-      });
-    }
-
-    function setupStickyBlockBars() {
-      const side = document.querySelector('.side');
-      const update = () => requestAnimationFrame(updateStickyBlockBars);
-
-      window.addEventListener('scroll', update, { passive: true });
-      window.addEventListener('resize', update);
-      if (side) side.addEventListener('scroll', update, { passive: true });
-
-      updateStickyBlockBars();
-    }
-
-    function updateStickyBlockBars() {
-      const side = document.querySelector('.side');
-      const mobile = isMobileLayout();
-      const stickyTop = mobile || !side ? 0 : side.getBoundingClientRect().top;
-
-      document.querySelectorAll('.block-card').forEach((block) => {
-        const sticky = block.querySelector('.block-sticky');
-        if (!sticky) return;
-
-        const blockRect = block.getBoundingClientRect();
-        const stickyHeight = sticky.offsetHeight;
-        const shouldFix = block.open && blockRect.top < stickyTop && blockRect.bottom > stickyTop + stickyHeight + 16;
-
-        if (!shouldFix) {
-          sticky.classList.remove('is-fixed');
-          sticky.removeAttribute('style');
-          return;
-        }
-
-        const width = Math.min(blockRect.width, window.innerWidth);
-        const left = Math.max(blockRect.left, 0);
-        sticky.style.setProperty('--sticky-top', `${stickyTop}px`);
-        sticky.style.setProperty('--sticky-left', `${left}px`);
-        sticky.style.setProperty('--sticky-width', `${width}px`);
-        sticky.style.setProperty('--sticky-height', `${stickyHeight}px`);
-        sticky.classList.add('is-fixed');
-      });
-    }
-
-    function isMobileLayout() {
-      return window.matchMedia('(max-width: 980px)').matches;
-    }
-
-    function markActiveDay(idx) {
-      document.querySelectorAll('.day').forEach((card, cardIdx) => {
-        card.classList.toggle('is-active', cardIdx === idx);
-      });
-    }
-
-    function fitDayBounds(idx) {
-      const bounds = L.latLngBounds([]);
-      const points = dayLayers[idx].day.points;
-      points.forEach(p => bounds.extend([p.lat, p.lon]));
-      map.invalidateSize();
-      map.fitBounds(bounds.pad(0.25));
-    }
-
-    function boundsForRouteIds(routeIds) {
-      const bounds = L.latLngBounds([]);
-      routeIds.forEach((routeId) => {
-        const layer = dayLayers.find(obj => obj.day.id === routeId);
-        if (!layer) return;
-        layer.day.points.forEach(p => bounds.extend([p.lat, p.lon]));
-      });
-      return bounds;
-    }
-
-    function revealMapOnMobile(idx) {
-      if (!isMobileLayout()) return;
-
-      setView('map');
-
-      setTimeout(() => {
-        map.invalidateSize();
-        fitDayBounds(idx);
-      }, 350);
-    }
-
-    function focusDay(idx) {
-      activeDayIndex = idx;
-      markActiveDay(idx);
-
-      if (!dayLayers[idx]) {
-        pendingFocusIndex = idx;
-        return;
-      }
-
-      dayLayers.forEach((obj, i) => {
-        if (map.hasLayer(obj.group)) map.removeLayer(obj.group);
-        if (i === idx) obj.group.addTo(map);
-      });
-      fitDayBounds(idx);
-      updateMapFilterState(dayLayers[idx].day.id);
-      revealMapOnMobile(idx);
-    }
-
-    function focusRouteById(routeId) {
-      const idx = dayLayers.findIndex(obj => obj.day.id === routeId);
-      if (idx === -1) return;
-      focusDay(idx);
-      if (!isMobileLayout()) setView('map');
-    }
-
-    function showAll() {
-      activeDayIndex = null;
-      markActiveDay(null);
-      dayLayers.forEach((obj) => {
-        if (fullRouteIds.includes(obj.day.id)) {
-          obj.group.addTo(map);
-        } else if (map.hasLayer(obj.group)) {
-          map.removeLayer(obj.group);
-        }
-      });
-      updateMapFilterState('all');
-      if (isMobileLayout()) setView('map');
-      fitAll();
-    }
-
-    function updateMapFilterState(routeId) {
-      const select = document.getElementById('route-filter');
-      const status = document.getElementById('map-status');
-      if (select && select.value !== routeId) select.value = routeId;
-      if (!status) return;
-
-      if (routeId === 'all') {
-        status.textContent = "Huidige totaalroute zichtbaar.";
-        return;
-      }
-
-      const route = days.find(day => day.id === routeId);
-      status.textContent = route ? `${route.date} · ${route.title} zichtbaar.` : "";
-    }
-
-    function fitAll() {
-      map.invalidateSize();
-      const bounds = boundsForRouteIds(fullRouteIds);
-      if (bounds.isValid()) map.fitBounds(bounds.pad(0.1));
-    }
-
-    async function init() {
-      document.querySelectorAll('[data-view-target]').forEach((button) => {
-        button.addEventListener('click', () => setView(button.dataset.viewTarget));
-      });
-      setupBlockControls();
-      setupStickyBlockBars();
-      setupRouteViewerButtons();
-      setupStayNavigation();
-      setupMapRouteFilter();
-      setView(isMobileLayout() ? 'overview' : 'map');
-
-      for (let i = 0; i < days.length; i++) {
-        await buildDay(days[i], i);
-      }
-      if (pendingFocusIndex !== null) {
-        const idx = pendingFocusIndex;
-        pendingFocusIndex = null;
-        focusDay(idx);
-        return;
-      }
-      showAll();
-      setTimeout(() => {
-        map.invalidateSize();
-        fitAll();
-      }, 250);
-    }
-
-    init();
-    window.addEventListener('resize', () => {
-      map.invalidateSize();
-      if (!isMobileLayout()) {
-        document.body.dataset.view = 'map';
-      }
-      if (activeDayIndex !== null) {
-        fitDayBounds(activeDayIndex);
-      } else {
-        fitAll();
-      }
-    });
-  </script>
+  <script src="assets/vendor/leaflet/leaflet.js"></script>
+  <script src="routekaart-data.js"></script>
+  <script src="routekaart-app.js"></script>
 </body>
 </html>
