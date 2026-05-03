@@ -52,3 +52,95 @@ summary{outline:none}
     transition: none;
   }
 }
+
+/* Apple-inspired visual refresh */
+:root {
+  --bg:#f5f5f7;
+  --card:rgba(255,255,255,.86);
+  --ink:#1d1d1f;
+  --muted:#6e6e73;
+  --line:rgba(60,60,67,.14);
+  --blue:#007aff;
+  --soft:rgba(0,122,255,.1);
+  --green:rgba(52,199,89,.1);
+  --amber:rgba(255,149,0,.1);
+  --rose:rgba(255,45,85,.09);
+  --shadow:0 10px 30px rgba(0,0,0,.06);
+}
+
+body {
+  font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  background:#f5f5f7;
+  color:#1d1d1f;
+  -webkit-font-smoothing:antialiased;
+}
+
+.hero {
+  background:linear-gradient(180deg, #1d1d1f 0%, #303034 100%);
+  border-radius:26px;
+  box-shadow:0 18px 46px rgba(0,0,0,.18);
+}
+
+.panel,
+.side,
+.card,
+.footer,
+.quick,
+.principle,
+.meta,
+.block,
+.day-link,
+.page-switch a {
+  background:rgba(255,255,255,.86);
+  border-color:rgba(60,60,67,.14);
+  box-shadow:0 10px 30px rgba(0,0,0,.06);
+  backdrop-filter:blur(18px);
+}
+
+.page-switch a,
+.hero-btn,
+.btn,
+.chip {
+  border-radius:12px;
+}
+
+.page-switch a[aria-current="page"],
+.btn {
+  background:#007aff;
+  border-color:#007aff;
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+.hero-btn {
+  color:#007aff !important;
+  -webkit-text-fill-color:#007aff !important;
+}
+
+.hero-btn.secondary {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+.card-head {
+  background:rgba(255,255,255,.72);
+}
+
+.card-head:hover,
+.day-link:hover {
+  background:#ffffff;
+}
+
+.dayno,
+.chip,
+.btn.secondary,
+.day-link[aria-current="true"] {
+  background:rgba(0,122,255,.1);
+  color:#007aff !important;
+  -webkit-text-fill-color:currentColor !important;
+}
+
+.chev,
+a {
+  color:#007aff !important;
+}

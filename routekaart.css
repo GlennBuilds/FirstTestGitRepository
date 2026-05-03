@@ -190,3 +190,194 @@ button.stay:hover { background:#f8fbff; color:#173ea5; }
   .sticky-actions { flex-shrink:0; }
   .sticky-actions a, .collapse-block { padding:7px 8px; }
 }
+
+/* Apple-inspired visual refresh */
+html, body {
+  font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  color:#1d1d1f;
+  background:#f5f5f7;
+  -webkit-font-smoothing:antialiased;
+}
+
+.layout { background:#f5f5f7; }
+.side {
+  background:rgba(245,245,247,.92);
+  border-right:1px solid rgba(60,60,67,.16);
+  scrollbar-color:rgba(60,60,67,.28) transparent;
+}
+
+h1 {
+  color:#1d1d1f;
+  font-weight:800;
+  letter-spacing:0;
+}
+
+.sub,
+.mini,
+.stay span,
+.block-hero p,
+.block-section p,
+.block-section ul,
+.block-section ol,
+.current-route-card span,
+.map-status {
+  color:#6e6e73;
+}
+
+button,
+.page-switch a,
+.sticky-actions a,
+.collapse-block,
+.route-actions a,
+.route-actions button,
+.current-route-card a {
+  font-family:inherit;
+  border-radius:12px;
+  font-weight:700;
+}
+
+button,
+.page-switch a,
+.sticky-actions a,
+.collapse-block,
+.route-filter-button {
+  color:#1d1d1f;
+  background:rgba(255,255,255,.82);
+  border-color:rgba(60,60,67,.18);
+  box-shadow:0 1px 1px rgba(0,0,0,.03);
+}
+
+button:hover,
+.page-switch a:hover,
+.stay:hover,
+.route-filter-button:hover {
+  background:#ffffff;
+}
+
+button.primary,
+.page-switch a[aria-current="page"],
+.route-actions button,
+.route-actions button.is-active-route,
+.route-filter-button.is-active-route,
+.route-date-button.is-selected,
+.mobile-nav button[aria-current="true"],
+.locate-control button.is-active {
+  background:#007aff;
+  border-color:#007aff;
+  color:#ffffff;
+  box-shadow:0 6px 18px rgba(0,122,255,.22);
+}
+
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+select:focus-visible {
+  outline:3px solid rgba(0,122,255,.24);
+}
+
+.overview-card,
+.block-card,
+.advice,
+.block-fact,
+.drive-card,
+.day-card,
+.scan-box,
+.map-control,
+.current-route-card {
+  background:rgba(255,255,255,.84);
+  border-color:rgba(60,60,67,.14);
+  box-shadow:0 10px 30px rgba(0,0,0,.06);
+  backdrop-filter:blur(18px);
+}
+
+.overview-card:first-child,
+.block-hero,
+.day-card summary {
+  background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(242,242,247,.92));
+  border-color:rgba(60,60,67,.12);
+}
+
+.overview-card h2,
+.block-hero h2,
+.block-section h3,
+.advice h4,
+.drive-card strong,
+.current-route-card strong,
+.route-calendar-head strong {
+  color:#1d1d1f;
+  font-weight:750;
+}
+
+.stat,
+.block-fact,
+.drive-card,
+.day-card,
+.scan-box {
+  background:rgba(255,255,255,.72);
+}
+
+.stat strong,
+.route-actions button.secondary,
+.route-date-count,
+.filter-icon,
+.locate-control button {
+  color:#007aff;
+}
+
+.route-actions a,
+.current-route-card a {
+  background:#ff9500;
+  border-color:#ff9500;
+  color:#ffffff;
+}
+
+.route-actions a.secondary,
+.route-actions button.secondary {
+  background:rgba(0,122,255,.1);
+  border-color:rgba(0,122,255,.14);
+  color:#007aff;
+}
+
+.travel-day {
+  background:rgba(255,149,0,.08);
+  border-color:rgba(255,149,0,.18);
+}
+
+.travel-day summary,
+.travel-day .day-card-body {
+  background:rgba(255,149,0,.08);
+  color:#9a5a00;
+}
+
+.block-sticky,
+.mobile-nav {
+  background:rgba(255,255,255,.86);
+  border-color:rgba(60,60,67,.18);
+  box-shadow:0 12px 34px rgba(0,0,0,.12);
+  backdrop-filter:blur(22px);
+}
+
+.mobile-nav button {
+  background:transparent;
+  border-color:transparent;
+  box-shadow:none;
+  color:#3a3a3c;
+}
+
+.mobile-nav button:hover {
+  background:rgba(118,118,128,.12);
+}
+
+.route-date-button {
+  background:rgba(118,118,128,.08);
+  border-color:transparent;
+}
+
+.route-date-button:hover {
+  background:rgba(118,118,128,.14);
+  border-color:transparent;
+}
+
+.mapwrap {
+  background:#e5e5ea;
+}
