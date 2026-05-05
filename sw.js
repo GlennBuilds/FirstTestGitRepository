@@ -1,4 +1,4 @@
-const CACHE_NAME = 'balkan2026-v12';
+const CACHE_NAME = 'balkan2026-v14';
 const MAP_CACHE_NAME = 'balkan2026-map-v1';
 const BASE_PATH = new URL('./', self.location.href).pathname;
 

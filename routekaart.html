@@ -19,8 +19,8 @@
   <div class="layout">
     <aside class="side">
       <nav class="page-switch" aria-label="Pagina wisselen">
-        <a href="routekaart.html" aria-current="page">Routekaart</a>
-        <a href="detailplanning.html">Detailplanning</a>
+        <button type="button" data-view-target="overview" data-view-scroll="overview-panel" aria-current="true">Overzicht</button>
+        <button type="button" data-view-target="blocks" data-view-scroll="blockplan">Reisplan</button>
       </nav>
       <h1>Balkan roadtrip 2026</h1>
       <div class="sub">Gebruik deze pagina als reisoverzicht: bekijk de route op de kaart, open per slaapplek het reisplan, klap dagdetails uit en stuur routes direct naar Google Maps of de kaartviewer.</div>
@@ -39,6 +39,7 @@
           <div class="mini">Podgorica Airport → Podgorica → Virpazar / Lake Skadar → Perast / Kotor Bay → Žabljak / Durmitor → Tjentište / Sutjeska → Sarajevo → Mostar / Herzegovina → Trebinje → Podgorica Airport.</div>
           <div class="route-actions" style="margin-top:10px;">
             <button type="button" onclick="showAll()">Toon huidige route in kaart</button>
+            <button class="desktop-map-toggle" id="desktop-map-toggle" type="button" aria-pressed="false">Verberg kaart</button>
           </div>
         </div>
         <div class="overview-card">

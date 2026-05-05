@@ -133,6 +133,12 @@ function handleViewTargetEvent(event) {
   if (!button) return;
   event.preventDefault();
   setView(button.dataset.viewTarget);
+  if (!isMobileLayout() && button.dataset.viewScroll) {
+    const target = document.getElementById(button.dataset.viewScroll);
+    if (target) {
+      setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+    }
+  }
 }
 
 function setupViewNavigation() {
@@ -496,6 +502,7 @@ function focusDay(idx) {
 function focusRouteById(routeId) {
   const idx = dayLayers.findIndex(obj => obj.day.id === routeId);
   if (idx === -1) return;
+  openDesktopMap();
   focusDay(idx);
   if (!isMobileLayout()) setView('map');
 }
@@ -512,8 +519,55 @@ function showAll(options = {}) {
     }
   });
   updateMapFilterState('all');
+  if (openMap) openDesktopMap();
   if (openMap && isMobileLayout()) setView('map');
   fitAll();
+}
+
+function updateDesktopMapToggle() {
+  const toggle = document.getElementById('desktop-map-toggle');
+  if (!toggle) return;
+
+  const collapsed = document.body.classList.contains('desktop-map-collapsed');
+  toggle.textContent = collapsed ? 'Toon kaart' : 'Verberg kaart';
+  toggle.setAttribute('aria-pressed', String(collapsed));
+}
+
+function openDesktopMap() {
+  if (isMobileLayout()) return;
+  document.body.classList.remove('desktop-map-collapsed');
+  updateDesktopMapToggle();
+  setTimeout(() => {
+    map.invalidateSize();
+    if (activeDayIndex !== null) {
+      fitDayBounds(activeDayIndex);
+    } else {
+      fitAll();
+    }
+  }, 80);
+}
+
+function setupDesktopMapToggle() {
+  const toggle = document.getElementById('desktop-map-toggle');
+  if (!toggle) return;
+
+  toggle.addEventListener('click', () => {
+    if (isMobileLayout()) return;
+    document.body.classList.toggle('desktop-map-collapsed');
+    updateDesktopMapToggle();
+    if (!document.body.classList.contains('desktop-map-collapsed')) {
+      setTimeout(() => {
+        map.invalidateSize();
+        if (activeDayIndex !== null) {
+          fitDayBounds(activeDayIndex);
+        } else {
+          fitAll();
+        }
+      }, 80);
+    }
+  });
+
+  updateDesktopMapToggle();
 }
 
 function setMapStatus(message) {
@@ -610,7 +664,8 @@ async function init() {
   setupStayNavigation();
   setupMapRouteFilter();
   setupUserLocationControl();
-  setView(isMobileLayout() ? 'overview' : 'map');
+  setupDesktopMapToggle();
+  setView('overview');
 
   days.forEach((day, index) => buildDay(day, index));
   showAll({ openMap: false });
@@ -631,6 +686,10 @@ Object.assign(window, { setView, showAll, fitAll, focusRouteById });
 
 init();
 window.addEventListener('resize', () => {
+  if (isMobileLayout()) {
+    document.body.classList.remove('desktop-map-collapsed');
+    updateDesktopMapToggle();
+  }
   map.invalidateSize();
   if (!isMobileLayout()) {
     document.body.dataset.view = 'map';
